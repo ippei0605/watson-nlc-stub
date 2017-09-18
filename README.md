@@ -57,12 +57,12 @@ $ npm install watson-nlc-stub
 ## 目次
 * [APIs](#apis)
     - [constructor(creds)](#constructorcreds)
-    - 
+    - [list(params, [callback])](#listparams-callback)
 
 ## APIs
 
 ### constructor(creds)
-スタブを生成します。watson-developer-cloud の名前と合わせて、次のように生成すると良いと思います。
+スタブを生成します。watson-developer-cloud の名前に合わせて、次のように生成すると良いと思います。
 
 ```javascript
 const NaturalLanguageClassifierV1 = require('watson-nlc-stub');
@@ -74,6 +74,49 @@ const nlc = new NaturalLanguageClassifierV1(creds);
 ---
 
 ### list(params, [callback])
+
+Classifier の一覧を取得します。
+
+```javascript
+nlc.list({}, (error, value) => {
+    if (error) {
+        console.log('error:', error);
+    } else {
+        console.log(value);
+    }
+});
+```
+
+* 結果
+
+    ```
+    { classifiers: [] }
+    ```
+
+    ```
+    { classifiers:
+       [ { classifier_id: '8999a8xa9a-nlc-888ab',
+           url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/8999a8xa9a-nlc-888ab',
+           name: 'watson-diet-trainer',
+           language: 'ja',
+           created: '2017-09-18T14:50:34.915Z' },
+         { classifier_id: 'ab9a98x8ba-nlc-9b9aa',
+           url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/ab9a98x8ba-nlc-9b9aa',
+           name: 'watson-diet-trainer-test',
+           language: 'ja',
+           created: '2017-09-18T14:51:05.812Z' } ] }
+
+    ```
+
+* 結果
+
+    ```
+    error: { code: 401, error: 'Not Authorized' }
+    ```
+
+[目次に戻る](#table-of-contents)
+
+---
 
 
 status, classifier, remove

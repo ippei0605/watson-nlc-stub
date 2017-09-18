@@ -50,7 +50,8 @@ nlc.remove({classifier_id: '6a3354x218-nlc-23458'}, (error, value) => {
 /*
 nlc.create({
     language: 'ja',
-    training_data: fs.createReadStream('classifier_10.csv')
+    name: 'watson-diet-trainer-test',
+    training_data: fs.createReadStream('classifier.csv')
 }, (error, value) => {
     if (error) {
         console.log('error:', error);

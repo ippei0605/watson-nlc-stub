@@ -1,5 +1,7 @@
 # watson-nlc-stub
 
+[![NPM](https://nodei.co/npm/watson-nlc-stub.png)](https://nodei.co/npm/watson-nlc-stub/)
+
 ## はじめに
 Watson Natural Language Classifier は自然言語分類してくれる素晴らしいサービスですが、個人使用となりますと高額なサービスだと思います。
 * ¥2,100.00 JPY/Classifier per month
@@ -10,6 +12,7 @@ Watson Natural Language Classifier は自然言語分類してくれる素晴ら
 
 ### 使い方
 ```javascript
+const NaturalLanguageClassifierV1 = require('watson-nlc-stub');
 const nlc = new NaturalLanguageClassifierV1(creds);
 nlc.list({}, (error, value) => {
     if (error) {
@@ -45,7 +48,32 @@ const creds = {
 $ npm install watson-nlc-stub
 ```
 
-## 
+### 参考情報
+* watson-developer-cloud
+    - https://www.npmjs.com/package/watson-developer-cloud
+
+---
+<a name="table-of-contents"></a>
+## 目次
+* [APIs](#apis)
+    - [constructor(creds)](#constructorcreds)
+    - 
+
+## APIs
+
+### constructor(creds)
+スタブを生成します。watson-developer-cloud の名前と合わせて、次のように生成すると良いと思います。
+
+```javascript
+const NaturalLanguageClassifierV1 = require('watson-nlc-stub');
+const nlc = new NaturalLanguageClassifierV1(creds);
+```
+
+[目次に戻る](#table-of-contents)
+
+---
+
+### list(params, [callback])
 
 
 status, classifier, remove

@@ -16,6 +16,7 @@ const
     fs = require('fs'),
     nlc = new NaturalLanguageClassifierV1(creds);
 
+/*
 nlc.list({}, (error, value) => {
     if (error) {
         console.log('error:', error);
@@ -23,6 +24,7 @@ nlc.list({}, (error, value) => {
         console.log(value);
     }
 });
+*/
 
 /*
 nlc.status({classifier_id: 'aa989ax8bb-nlc-b8989'}, (error, value) => {
@@ -44,10 +46,10 @@ nlc.remove({classifier_id: '6a3354x218-nlc-23458'}, (error, value) => {
 });
 */
 
-
+/*
 nlc.create({
     language: 'ja',
-    training_data: fs.createReadStream('classifier.csv')
+    training_data: fs.createReadStream('classifier_10.csv')
 }, (error, value) => {
     if (error) {
         console.log('error:', error);
@@ -55,4 +57,15 @@ nlc.create({
         console.log(value);
     }
 });
+*/
 
+nlc.classify({
+    classifier_id: 'bba998x99b-nlc-ab888',
+    text: '。。。。。。'
+}, (error, value) => {
+    if (error) {
+        console.log('error:', error);
+    } else {
+        console.log(value);
+    }
+});

@@ -166,18 +166,31 @@ class Stub {
 
                 params.training_data.on('end', () => {
                     const classes = {};
-                    let count = 0;
+                    let count = 0, maxPhrase = 0;
                     csv.split('\n').forEach((row) => {
                         const item = row.split(',');
                         if (item.length === 2) {
                             const class_name = item[1].replace(/^["']|["']$/g, '');
                             const question = item[0].replace(/^["']|["']$/g, '');
+                            maxPhrase = maxPhrase > question.length ? maxPhrase : question.length;
                             classes[class_name] = classes[class_name] ? classes[class_name] += question : question;
                             count++;
                         }
                     });
 
-                    if (count >= 5) {
+                    if (count < 5) {
+                        execCallback(callback, {
+                            code: 400,
+                            error: 'Data too small',
+                            description: `The number of training entries received = ${count}, which is smaller than the required minimum of 5`
+                        }, null);
+                    } else if (maxPhrase > 1024) {
+                        execCallback(callback, {
+                            code: 400,
+                            error: 'Phrase too long',
+                            description: `The phrase at line 1 has ${maxPhrase.toLocaleString()} characters which is larger than the permitted maximum of 1,024 characters.`
+                        }, null);
+                    } else {
                         const created = moment.utc().format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
 
                         this.nlc.insert({
@@ -200,12 +213,6 @@ class Stub {
                                 created: created
                             });
                         });
-                    } else {
-                        execCallback(callback, {
-                            code: 400,
-                            error: 'Data too small',
-                            description: `The number of training entries received = ${count}, which is smaller than the required minimum of 5`
-                        }, null);
                     }
                 });
             } else {
@@ -218,6 +225,61 @@ class Stub {
         });
     }
 
+    classify (params, callback) {
+        // パラメータをチェックする。
+        if (!params.classifier_id) throw new Error('Missing required parameters: classifier_id');
+        if (!params.text) throw new Error('Missing required parameters: text');
+
+        // Classifier を削除する。
+        this.nlc.get(params.classifier_id, (error, value) => {
+            if (error) {
+                console.log('error:', error);
+                checkUnauthorized(error, callback);
+                checkNotFound(error, callback);
+            } else {
+                const classes = value.classes, temp = [];
+                let total = 0, top;
+                for (const key in classes) {
+                    let confidence = 0;
+                    if (~classes[key].indexOf(params.text)) {
+                        confidence = 1;
+                        total++;
+                    }
+                    temp.push({
+                        class_name: key,
+                        confidence: confidence
+                    });
+                }
+                temp.sort((a, b) => {
+                    if (a.confidence > b.confidence)
+                        return -1;
+                    if (a.confidence < b.confidence)
+                        return 1;
+                    return 0;
+                });
+                if (temp.length > 10) {
+                    top = temp.slice(0, 10);
+                } else {
+                    top = temp;
+                }
+                const length = top.length;
+                top.forEach((item) => {
+                    if (total === 0) {
+                        item.confidence = 1 / length;
+                    } else {
+                        item.confidence = item.confidence / total;
+                    }
+                });
+                execCallback(callback, null, {
+                    classifier_id: params.classifier_id,
+                    url: value.url,
+                    text: params.text,
+                    top_class: top[0].class_name,
+                    classes: top
+                });
+            }
+        });
+    }
 }
 
 module.exports = Stub;

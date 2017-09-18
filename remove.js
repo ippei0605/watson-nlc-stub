@@ -17,7 +17,7 @@ const creds = {
 const nlc = new watson.NaturalLanguageClassifierV1(creds);
 
 nlc.remove({
-    classifier_id: '6a3354x218-nlc-19705'
+    classifier_id: '6a3354x218-nlc-24338'
 }, (error, value) => {
     if (error) {
         console.log('error:', error);

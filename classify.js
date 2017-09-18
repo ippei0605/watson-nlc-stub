@@ -17,8 +17,8 @@ const creds = {
 const nlc = new watson.NaturalLanguageClassifierV1(creds);
 
 nlc.classify({
-    classifier_id: '85e19dx225-nlc-6421',
-    text: 'こんにちは'
+    classifier_id: '6a25a7x216-nlc-24437',
+    text: 'おはよう'
 }, (error, value) => {
     if (error) {
         console.log('error:', error);

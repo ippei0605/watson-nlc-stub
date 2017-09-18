@@ -92,6 +92,13 @@ Availableを返す
 ```
 
 
+```json
+{ code: 400,
+  error: 'Phrase too long',
+  description: 'The phrase at line 1 has 1,025 characters which is larger than the permitted maximum of 1,024 characters.' }
+
+```
+
 
 ## remove
 ```json

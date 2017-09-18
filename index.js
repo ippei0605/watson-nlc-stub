@@ -8,9 +8,8 @@
 
 // モジュールを読込む。
 const
-    fs = require('fs'),
-    moment = require('moment'),
-    Cloudant = require('cloudant');
+    Cloudant = require('cloudant'),
+    moment = require('moment');
 
 // マップ定義: Classifier 一覧を取得
 const map = `function (doc) {

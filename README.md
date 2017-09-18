@@ -1,5 +1,40 @@
 # watson-nlc-stub
 
+## はじめに
+Watson Natural Language Classifier は自然言語分類してくれる素晴らしいサービスですが、個人での使用となります高額なサービスだと思います。
+* ¥2,100.00 JPY/Classifier per month
+* ¥0.3675 JPY/ API call (1000 API calls free per month)
+* ¥315.00 JPY/ Training (4 Training Events free per month)
+
+そこで、開発中はなるべく費用がかからないよう、かつ、それなりの動作をするスタブを開発しました。  
+
+### 使い方
+```javascript
+const nlc = new NaturalLanguageClassifierV1(creds);
+nlc.list({}, (error, value) => {
+    if (error) {
+        console.log('error:', error);
+    } else {
+        console.log(value);
+    }
+});
+```
+
+
+### システム要件
+次のサービスを使用してください。
+* IBM Bluemix
+    - Cloudant NoSQL DB
+* Node.js
+    - 6 以上
+
+### インストール
+```
+$ npm install watson-nlc-stub
+```
+
+## 
+
 
 status, classifier, remove
 ```json

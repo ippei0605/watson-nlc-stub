@@ -1,0 +1,29 @@
+{
+  "name": "watson-nlc-stub",
+  "version": "0.0.1",
+  "description": "Watson NLC Stub",
+  "author": "Ippei SUZUKI",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ippei0605/watson-nlc-stub.git"
+  },
+  "license": "MIT",
+  "main": "./index",
+  "scripts": {
+    "doc": "jsdoc -c jsdoc-conf.json *.js test/*.js",
+    "test": "istanbul cover _mocha",
+    "codecov": "codecov"
+  },
+  "dependencies": {
+    "cloudant": "^1.8.0",
+    "moment": "^2.18.1",
+    "watson-developer-cloud": "^2.39.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "codecov": "^2.3.0",
+    "istanbul": "^0.4.5",
+    "jsdoc": "^3.5.5",
+    "mocha": "^3.5.3"
+  }
+}

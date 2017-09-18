@@ -1,0 +1,21 @@
+# NPM モジュール
+node_modules
+
+# JSDoc の出力先
+out/
+
+# istanbul の出力先
+coverage/
+
+# 設定ファイル
+.idea
+*.iml
+.settings/
+.project
+
+# その他
+.setenv
+.command-memo
+package-lock.json
+public/dist/
+upload/

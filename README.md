@@ -1,12 +1,12 @@
 # watson-nlc-stub
 
 ## はじめに
-Watson Natural Language Classifier は自然言語分類してくれる素晴らしいサービスですが、個人での使用となります高額なサービスだと思います。
+Watson Natural Language Classifier は自然言語分類してくれる素晴らしいサービスですが、個人使用となりますと高額なサービスだと思います。
 * ¥2,100.00 JPY/Classifier per month
 * ¥0.3675 JPY/ API call (1000 API calls free per month)
 * ¥315.00 JPY/ Training (4 Training Events free per month)
 
-そこで、開発中はなるべく費用がかからないよう、かつ、それなりの動作をするスタブを開発しました。  
+そこで、開発中はなるべく費用がかからないよう、且つ、それなりの動作をするスタブを開発しました。  
 
 ### 使い方
 ```javascript
@@ -20,6 +20,18 @@ nlc.list({}, (error, value) => {
 });
 ```
 
+> creds は Cloudant NoSQL DB のサービス資格情報にデータベース名 (dbname) を付加した次のようなオブジェクトです。
+
+```javascript
+const creds = {
+    "dbname": "nlc",
+    "username": "a5xxx999-xxxx-xxxx-xxxx-5c6b5d2d6ed6-bluemix",
+    "password": "xxxxx2077xxxxxb7a629efbe58fb0c0048329e789c4b0372247cda1df82xxxxx",
+    "host": "a5xxx999-xxxx-xxxx-xxxx-5c6b5d2d6ed6-bluemix.cloudant.com",
+    "port": 443,
+    "url": "https://a5xxx999-xxxx-xxxx-9274-5c6b5d2d6ed6-bluemix:8f8c92077fac62b7a629efbe58fb0c0048329e789c4b0372247cda1df82xxxxx@a5xxx999-xxxx-xxxx-xxxx-5c6b5d2d6ed6-bluemix.cloudant.com"
+};
+```
 
 ### システム要件
 次のサービスを使用してください。

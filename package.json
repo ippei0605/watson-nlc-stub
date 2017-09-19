@@ -10,7 +10,7 @@
   "license": "MIT",
   "main": "./index",
   "scripts": {
-    "doc": "jsdoc -c jsdoc-conf.json *.js test/*.js",
+    "doc": "jsdoc -c jsdoc-conf.json index.js",
     "test": "istanbul cover _mocha",
     "codecov": "codecov"
   },

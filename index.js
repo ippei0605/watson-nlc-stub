@@ -82,13 +82,33 @@ const checkNotFound = (error, callback) => {
     }
 };
 
-class Stub {
+class NlcStub {
+    /**
+     * コンストラクター
+     * @classdesc Q&A モデル
+     * @param creds {object} Cloudant NoSQL DB のサービス資格情報 + データベース名 (dbname)
+     */
     constructor (creds) {
+        /**
+         * Cloudant NoSQL DB サービス
+         * @type {Cloudant}
+         */
         this.nlc = initDatabase(creds);
     }
 
+    /**
+     * コールバックする。
+     * @callback nlcCallback
+     * @param {object} error エラー
+     * @param {object} value 結果
+     */
+
+    /**
+     * Classifier 一覧を取得する。
+     * @param params {object} パラメータ
+     * @param callback {nlcCallback} コールバック
+     */
     list (params, callback) {
-        // Classifier 一覧を取得する。
         this.nlc.view('classifiers', 'list', (error, value) => {
             if (error) {
                 console.log('error:', error);
@@ -102,6 +122,11 @@ class Stub {
         });
     }
 
+    /**
+     * Classifier 情報を取得する。
+     * @param params {object} パラメータ
+     * @param callback {nlcCallback} コールバック
+     */
     status (params, callback) {
         // パラメータをチェックする。
         if (!params.classifier_id) throw new Error('Missing required parameters: classifier_id');
@@ -126,6 +151,11 @@ class Stub {
         });
     }
 
+    /**
+     * Classifier を削除する。
+     * @param params {object} パラメータ
+     * @param callback {nlcCallback} コールバック
+     */
     remove (params, callback) {
         // パラメータをチェックする。
         if (!params.classifier_id) throw new Error('Missing required parameters: classifier_id');
@@ -144,6 +174,11 @@ class Stub {
         });
     }
 
+    /**
+     * Classifier を作成する。
+     * @param params {object} パラメータ
+     * @param callback {nlcCallback} コールバック
+     */
     create (params, callback) {
         // パラメータをチェックする。
         if (!params.language) throw new Error('Missing required parameters: language');
@@ -153,7 +188,7 @@ class Stub {
         this.list({}, (error, value) => {
             if (value.classifiers.length < 8) {
                 const classifier_id = '??????x???-nlc-?????'.replace(/[?]/g, (c) => {
-                    const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
                     return v.toString(16);
                 });
                 const url = `https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/${classifier_id}`;
@@ -190,7 +225,7 @@ class Stub {
                             description: `The phrase at line 1 has ${maxPhrase.toLocaleString()} characters which is larger than the permitted maximum of 1,024 characters.`
                         }, null);
                     } else {
-                        const created = moment.utc().format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
+                        const created = moment.utc().format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
 
                         this.nlc.insert({
                             _id: classifier_id,
@@ -224,6 +259,11 @@ class Stub {
         });
     }
 
+    /**
+     * テキストをクラス分類する。
+     * @param params {object} パラメータ
+     * @param callback {nlcCallback} コールバック
+     */
     classify (params, callback) {
         // パラメータをチェックする。
         if (!params.classifier_id) throw new Error('Missing required parameters: classifier_id');
@@ -281,4 +321,4 @@ class Stub {
     }
 }
 
-module.exports = Stub;
+module.exports = NlcStub;

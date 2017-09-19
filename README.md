@@ -86,13 +86,17 @@ nlc.list({}, (error, value) => {
     }
 });
 ```
+実行結果を以下に示します。
 
-* 結果
-
+* Classifier がない場合
+    - エラー (error): null
+    - 結果 (value)
     ```
     { classifiers: [] }
     ```
-
+* Classifier がある場合
+    - エラー (error): null
+    - 結果 (value)
     ```
     { classifiers:
        [ { classifier_id: '8999a8xa9a-nlc-888ab',
@@ -108,11 +112,12 @@ nlc.list({}, (error, value) => {
 
     ```
 
-* 結果
-
+* サービス資格情報 (url) のユーザー名またはパスワードが間違っている場合
+    - エラー (error)
     ```
-    error: { code: 401, error: 'Not Authorized' }
+    { code: 401, error: 'Not Authorized' }
     ```
+    - 結果 (value): null
 
 [目次に戻る](#table-of-contents)
 

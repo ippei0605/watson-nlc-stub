@@ -36,9 +36,16 @@ const designDoc = {
     "language": "javascript"
 };
 
+
+/**
+ * Cloudant NoSQL DB サービス
+ * @typedef {object} cloudant
+ * @property {object} db
+ */
+
 const initDatabase = (creds) => {
     const cloudant = new Cloudant(creds.url);
-    cloudant.db.get(creds.dbname, (error, value) => {
+    cloudant.db.get(creds.dbname, (error) => {
         if (error && error.error === 'not_found') {
             cloudant.db.create(creds.dbname, (error) => {
                 if (error) {
@@ -90,8 +97,7 @@ class NlcStub {
      */
     constructor (creds) {
         /**
-         * Cloudant NoSQL DB サービス
-         * @type {Cloudant}
+         * NLC データベース
          */
         this.nlc = initDatabase(creds);
     }
@@ -103,12 +109,14 @@ class NlcStub {
      * @param {object} value 結果
      */
 
+    // noinspection JSUnusedLocalSymbols
     /**
      * Classifier 一覧を取得する。
      * @param params {object} パラメータ
      * @param callback {nlcCallback} コールバック
      */
     list (params, callback) {
+        // noinspection Annotator
         this.nlc.view('classifiers', 'list', (error, value) => {
             if (error) {
                 console.log('error:', error);
@@ -152,6 +160,18 @@ class NlcStub {
     }
 
     /**
+     * @typedef {object} Document
+     * @property {string} _id
+     * @property {string} _rev
+     * @property {string} type
+     * @property {string} url
+     * @property {string} name
+     * @property {string} language
+     * @property {string} created
+     * @property {object} classes
+     */
+
+    /**
      * Classifier を削除する。
      * @param params {object} パラメータ
      * @param callback {nlcCallback} コールバック
@@ -167,6 +187,7 @@ class NlcStub {
                 checkUnauthorized(error, callback);
                 checkNotFound(error, callback);
             } else {
+                /** @type {Document} */
                 this.nlc.destroy(value._id, value._rev, () => {
                     execCallback(callback, null, {});
                 });
@@ -280,10 +301,12 @@ class NlcStub {
                 let total = 0, top;
                 for (const key in classes) {
                     let confidence = 0;
+                    // noinspection JSUnfilteredForInLoop
                     if (~classes[key].indexOf(params.text)) {
                         confidence = 1;
                         total++;
                     }
+                    // noinspection JSUnfilteredForInLoop
                     temp.push({
                         class_name: key,
                         confidence: confidence

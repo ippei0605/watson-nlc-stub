@@ -26,7 +26,6 @@ nlc.list({}, (error, value) => {
     }
 });
 
-
 /*
 nlc.status({classifier_id: 'aa989ax8bb-nlc-b8989'}, (error, value) => {
     if (error) {
@@ -61,10 +60,10 @@ nlc.create({
 });
 */
 
-/*
+
 nlc.classify({
-    classifier_id: 'bba998x99b-nlc-ab888',
-    text: '。。。。。。'
+    classifier_id: '8999a8xa9a-nlc-888ab',
+    text: 'こんにちは'
 }, (error, value) => {
     if (error) {
         console.log('error:', error);
@@ -72,4 +71,3 @@ nlc.classify({
         console.log(value);
     }
 });
-*/

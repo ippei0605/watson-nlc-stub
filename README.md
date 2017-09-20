@@ -86,6 +86,7 @@ nlc.list({}, (error, value) => {
     }
 });
 ```
+
 実行結果を以下に示します。
 
 * Classifier がない場合
@@ -123,6 +124,28 @@ nlc.list({}, (error, value) => {
 
 ---
 
+### status(params, [callback])
+
+Classifier 情報を取得する。
+
+```javascript
+nlc.status({classifier_id: 'aa989ax8bb-nlc-b8989'}, (error, value) => {
+    if (error) {
+        console.log('error:', error);
+    } else {
+        console.log(value);
+    }
+});
+```
+実行結果を以下に示します。
+
+
+
+[目次に戻る](#table-of-contents)
+
+---
+
+
 
 status, classifier, remove
 ```json
@@ -134,38 +157,6 @@ status, classifier, remove
 ```
 
 
-## list 
-
-なし
-```json
-{ classifiers: [] }
-
-```
-
-2こ
-```json
-{ classifiers: 
-   [ { classifier_id: '6a25a7x216-nlc-19811',
-       url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/6a25a7x216-nlc-19811',
-       name: 'name',
-       language: 'ja',
-       created: '2017-09-16T14:27:00.544Z' },
-     { classifier_id: '6a3354x218-nlc-19668',
-       url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/6a3354x218-nlc-19668',
-       name: 'name',
-       language: 'ja',
-       created: '2017-09-16T14:25:17.255Z' } ] }
-
-```
-
-
-ユーザーエラー、パスワードエラー
-```json
-{
-  code: 401,
-  error: 'Not Authorized',
-}
-```
 
 
 ## status

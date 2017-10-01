@@ -57,7 +57,9 @@ $ npm install watson-nlc-stub
 ## 目次
 * [APIs](#apis)
     - [constructor(creds)](#constructorcreds)
+    - [create(params, [callback])](#createparams-callback)
     - [list(params, [callback])](#listparams-callback)
+
 
 ## APIs
 
@@ -73,8 +75,107 @@ const nlc = new NaturalLanguageClassifierV1(creds);
 
 ---
 
-### list(params, [callback])
+### create(params, [callback])
+Classifier を作成します。
 
+```javascript
+nlc.create({
+    language: 'ja',
+    name: 'watson-diet-trainer-test',
+    training_data: fs.createReadStream('classifier.csv')
+}, (error, value) => {
+    if (error) {
+        console.log('error:', error);
+    } else {
+        console.log(value);
+    }
+});
+```
+
+パラメータを以下に示します。
+
+|Parameter	  |Type         |Description |
+|:------------|:------------|:-----------|
+|language     |string       |'ja' などを指定してください。スタブの動作としては意味はありません。ない場合は Error('Missing required parameters: language') をスローします。|
+|name         |string       |ない場合は null になります。|
+|training_data|file / string|ReadStream をない場合は Error('Missing required parameters: training_data') をスローします。
+
+
+if (!params.language) throw new ;
+        if (!params.training_data) throw new 
+
+実行結果を以下に示します。
+
+```json
+{
+  classifier_id: '6a3354x218-nlc-19668',
+  name: 'name',
+  language: 'ja',
+  created: '2017-09-16T14:25:17.255Z',
+  url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/6a3354x218-nlc-19668',
+  status: 'Training',
+  status_description: 'The classifier instance is in its training phase, not yet ready to accept classify requests'
+}
+```
+
+9個目をcreate しようとするとエラー
+````json
+{
+  code: 400,
+  error: 'Entitlement error',
+  description: 'This user or service instance has the maximum number of classifiers.'
+}
+````
+
+データが少ない、５行ならOK
+```json
+{
+  code: 400,
+  error: 'Data too small',
+  description: 'The number of training entries received = 2, which is smaller than the required minimum of 5' }
+
+```
+
+
+code: 400,
+  error: 'Malformed data',
+  description: 'The \'training entry\' value at line 15,000 and column 1 is \'empty\'.' }
+
+
+本物は watson-developer-cloud は15002 で以下のエラーになります。バグじゃないかな？
+スタブは15001でエラーとしています。
+
+
+ ```json
+{
+  code: 400,
+  error: 'Too many data instances',
+  description: 'The number of training entries received = 15,001, which is larger than the permitted maximum of 15,000'
+}
+```
+
+
+```json
+{ code: 400,
+  error: 'Phrase too long',
+  description: 'The phrase at line 1 has 1,025 characters which is larger than the permitted maximum of 1,024 characters.' }
+
+```
+
+
+
+* サービス資格情報 (url) のユーザー名またはパスワードが間違っている場合
+    - エラー (error)
+    ```
+    { code: 401, error: 'Not Authorized' }
+    ```
+    - 結果 (value): null
+
+[目次に戻る](#table-of-contents)
+
+---
+
+### list(params, [callback])
 Classifier の一覧を取得します。
 
 ```javascript
@@ -87,15 +188,18 @@ nlc.list({}, (error, value) => {
 });
 ```
 
+パラメータを以下に示します。
+* なし
+
 実行結果を以下に示します。
 
-* Classifier がない場合
+* Classifier が１つも存在しない場合
     - エラー (error): null
     - 結果 (value)
     ```
     { classifiers: [] }
     ```
-* Classifier がある場合
+* Classifier が1つ以上存在する場合
     - エラー (error): null
     - 結果 (value)
     ```
@@ -174,44 +278,6 @@ Availableを返す
   }
 ```
 
-## create
-```json
-{
-  classifier_id: '6a3354x218-nlc-19668',
-  name: 'name',
-  language: 'ja',
-  created: '2017-09-16T14:25:17.255Z',
-  url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/6a3354x218-nlc-19668',
-  status: 'Training',
-  status_description: 'The classifier instance is in its training phase, not yet ready to accept classify requests'
-}
-```
-
-9個目をcreate しようとするとエラー
-````json
-{
-  code: 400,
-  error: 'Entitlement error',
-  description: 'This user or service instance has the maximum number of classifiers.'
-}
-````
-
-データが少ない、５行ならOK
-```json
-{
-  code: 400,
-  error: 'Data too small',
-  description: 'The number of training entries received = 2, which is smaller than the required minimum of 5' }
-
-```
-
-
-```json
-{ code: 400,
-  error: 'Phrase too long',
-  description: 'The phrase at line 1 has 1,025 characters which is larger than the permitted maximum of 1,024 characters.' }
-
-```
 
 
 ## remove

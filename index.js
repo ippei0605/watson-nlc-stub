@@ -1,6 +1,5 @@
 /**
- * Watson Natural Language Classifier Stub
- * @module index
+ * @file Watson Natural Language Classifier Stub
  * @author Ippei SUZUKI
  */
 
@@ -86,6 +85,89 @@ const checkNotFound = (error, callback) => {
             error: 'Not found',
             description: 'Classifier not found.'
         }, null);
+    }
+};
+
+const insert = (nlc, params, csv, callback) => {
+    const
+        classes = {},
+        line = csv.replace(/\n$/, '').split('\n');
+    let
+        isError = false,
+        count = 0;
+
+    if (line.length > 15000) {
+        execCallback(callback, {
+            code: 400,
+            error: 'Too many data instances',
+            description: `The number of training entries received = ${line.length.toLocaleString()}, which is larger than the permitted maximum of 15,000`
+        }, null);
+    } else if (line.length < 5) {
+        execCallback(callback, {
+            code: 400,
+            error: 'Data too small',
+            description: `The number of training entries received = ${line.length}, which is smaller than the required minimum of 5`
+        }, null);
+    } else {
+        line.forEach((row) => {
+            count++;
+            const item = row.split(',');
+            if (!item[0].trim()) {
+                isError = true;
+                execCallback(callback, {
+                    code: 400,
+                    error: 'Malformed data',
+                    description: `The \'training entry\' value at line ${count.toLocaleString()} and column 1 is \'empty\'.'`
+                }, null);
+            } else if (item.length === 2) {
+                const
+                    class_name = item[1].replace(/^["']|["']$/g, ''),
+                    question = item[0].replace(/^["']|["']$/g, ''),
+                    length = question.length;
+
+                classes[class_name] = classes[class_name] ? classes[class_name] += question : question;
+
+                if (length > 1024) {
+                    isError = true;
+                    execCallback(callback, {
+                        code: 400,
+                        error: 'Phrase too long',
+                        description: `The phrase at ${count.toLocaleString()} has ${length.toLocaleString()} characters which is larger than the permitted maximum of 1,024 characters.`
+                    }, null);
+                }
+            }
+        });
+
+        if (!isError) {
+            const
+                classifier_id = '??????x???-nlc-?????'.replace(/[?]/g, (c) => {
+                    return Math.floor(Math.random() * 0xF).toString(16);
+                }),
+                url = `https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/${classifier_id}`,
+                created = moment.utc().format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]'),
+                name = params.name ? params.name : null;
+
+            nlc.insert({
+                _id: classifier_id,
+                type: 'classifier',
+                url: url,
+                name: name,
+                language: params.language,
+                created: created,
+                classes: classes
+            }, (error) => {
+                if (error) {
+                    console.log('error:', error);
+                }
+                execCallback(callback, null, {
+                    classifier_id: classifier_id,
+                    url: url,
+                    name: name,
+                    language: params.language,
+                    created: created
+                });
+            });
+        }
     }
 };
 
@@ -204,80 +286,32 @@ class NlcStub {
         // パラメータをチェックする。
         if (!params.language) throw new Error('Missing required parameters: language');
         if (!params.training_data) throw new Error('Missing required parameters: training_data');
-        const name = params.name ? params.name : null;
 
         this.list({}, (error, value) => {
-            if (value.classifiers.length < 8) {
-                const classifier_id = '??????x???-nlc-?????'.replace(/[?]/g, (c) => {
-                    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-                    return v.toString(16);
-                });
-                const url = `https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/${classifier_id}`;
-
-                let csv = '';
-                params.training_data.on('data', (data) => {
-                    csv += data;
-                });
-
-                params.training_data.on('end', () => {
-                    const classes = {};
-                    let count = 0, maxPhrase = 0;
-                    csv.split('\n').forEach((row) => {
-                        const item = row.split(',');
-                        if (item.length === 2) {
-                            const class_name = item[1].replace(/^["']|["']$/g, '');
-                            const question = item[0].replace(/^["']|["']$/g, '');
-                            maxPhrase = maxPhrase > question.length ? maxPhrase : question.length;
-                            classes[class_name] = classes[class_name] ? classes[class_name] += question : question;
-                            count++;
-                        }
-                    });
-
-                    if (count < 5) {
-                        execCallback(callback, {
-                            code: 400,
-                            error: 'Data too small',
-                            description: `The number of training entries received = ${count}, which is smaller than the required minimum of 5`
-                        }, null);
-                    } else if (maxPhrase > 1024) {
-                        execCallback(callback, {
-                            code: 400,
-                            error: 'Phrase too long',
-                            description: `The phrase at line 1 has ${maxPhrase.toLocaleString()} characters which is larger than the permitted maximum of 1,024 characters.`
-                        }, null);
+                if (error) {
+                    execCallback(callback, error, null);
+                } else if (value.classifiers.length < 8) {
+                    if (typeof params.training_data === 'string') {
+                        insert(this.nlc, params, params.training_data, callback);
                     } else {
-                        const created = moment.utc().format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+                        let csv = '';
+                        params.training_data.on('data', (data) => {
+                            csv += data;
+                        });
 
-                        this.nlc.insert({
-                            _id: classifier_id,
-                            type: 'classifier',
-                            url: url,
-                            name: name,
-                            language: params.language,
-                            created: created,
-                            classes: classes
-                        }, (error) => {
-                            if (error) {
-                                console.log('error:', error);
-                            }
-                            execCallback(callback, null, {
-                                classifier_id: classifier_id,
-                                url: url,
-                                name: name,
-                                language: params.language,
-                                created: created
-                            });
+                        params.training_data.on('end', () => {
+                            insert(this.nlc, params, csv, callback);
                         });
                     }
-                });
-            } else {
-                execCallback(callback, {
-                    code: 400,
-                    error: 'Entitlement error',
-                    description: 'This user or service instance has the maximum number of classifiers.'
-                }, null);
+                } else {
+                    execCallback(callback, {
+                        code: 400,
+                        error: 'Entitlement error',
+                        description: 'This user or service instance has the maximum number of classifiers.'
+                    }, null);
+                }
             }
-        });
+        );
     }
 
     /**
@@ -290,7 +324,6 @@ class NlcStub {
         if (!params.classifier_id) throw new Error('Missing required parameters: classifier_id');
         if (!params.text) throw new Error('Missing required parameters: text');
 
-        // Classifier を削除する。
         this.nlc.get(params.classifier_id, (error, value) => {
             if (error) {
                 console.log('error:', error);

@@ -66,7 +66,7 @@ $ npm install watson-nlc-stub
 * [remove(params, [callback])](#removeparams-callback)
 * [classify(params, [callback])](#classifyparams-callback)
 
-### constructor(creds)
+## constructor(creds)
 スタブを生成します。watson-developer-cloud の名前に合わせて、次のように生成すると良いと思います。
 
 ```javascript
@@ -78,7 +78,7 @@ const nlc = new NaturalLanguageClassifierV1(creds);
 
 ---
 
-### create(params, [callback])
+## create(params, [callback])
 Classifier を作成します。
 
 ```javascript
@@ -99,9 +99,9 @@ nlc.create({
 
 |Property	  |Type         |Description |
 |:------------|:------------|:-----------|
-|language     |string       |'ja' などを指定してください。スタブの動作としては意味はありません。ない場合は Error('Missing required parameters: language') をスローします。|
-|name         |string       |ない場合は null になります。|
-|training_data|file / string|ReadStream をない場合は Error('Missing required parameters: training_data') をスローします。
+|language     |string       |'ja' などを指定してください。スタブの動作としては意味はありません。未設定時は Error('Missing required parameters: language') をスローします。|
+|name         |string       |未設定時は null をセットします。|
+|training_data|file / string|学習データ。(file は readStream) 未設定時はは Error('Missing required parameters: training_data') をスローします。
 
 実行結果の例を以下に示します。
 
@@ -195,7 +195,7 @@ nlc.create({
 
 ---
 
-### list(params, [callback])
+## list(params, [callback])
 Classifier の一覧を取得します。
 
 ```javascript
@@ -262,12 +262,14 @@ nlc.list({}, (error, value) => {
 
 ---
 
-### status(params, [callback])
+## status(params, [callback])
 
-Classifier 情報を取得する。
+Classifier 情報を取得します。ステータスは Available (固定値) を返します。
 
 ```javascript
-nlc.status({classifier_id: 'aa989ax8bb-nlc-b8989'}, (error, value) => {
+nlc.status({
+    classifier_id: 'aa989ax8bb-nlc-b8989'
+}, (error, value) => {
     if (error) {
         console.log('error:', error);
     } else {
@@ -275,20 +277,68 @@ nlc.status({classifier_id: 'aa989ax8bb-nlc-b8989'}, (error, value) => {
     }
 });
 ```
-実行結果を以下に示します。
 
+第1パラメータ params のプロパティを以下に示します。
 
+|Property	  |Type         |Description |
+|:------------|:------------|:-----------|
+|classifier_id|string       |Classifier ID。未設定時は Error('Missing required parameters: classifier_id') をスローします。|
+
+実行結果の例を以下に示します。
+
+- 正常ケース
+    - error: null
+    - value:
+    
+        ```
+        {
+          classifier_id: '6a25a7x216-nlc-19811',
+          name: 'name',
+          language: 'ja',
+          created: '2017-09-16T14:27:00.544Z',
+          url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/6a25a7x216-nlc-19811',
+          status: 'Available',
+          status_description: 'The classifier instance is now available and is ready to take classifier requests.'
+        }
+        ```
+
+- エラーケース: サービス資格情報 (url) のユーザー名またはパスワードが間違っている
+    - error:
+    
+        ```
+        {
+          code: 401,
+          error: 'Not Authorized'
+        }
+        ```
+        
+    - value: null
+
+- エラーケース: 指定した Classifier が存在しない
+    - error:
+    
+        ```
+        {
+          code: 404,
+          error: 'Not found',
+          description: 'Classifier not found.'
+        }
+        ```
+        
+    - value: null
 
 [API Reference](#api-reference)
 
 ---
 
-### remove(params, [callback])
+## remove(params, [callback])
 
-Classifier 情報を取得する。
+Classifier を削除します。
 
 ```javascript
-nlc.status({classifier_id: 'aa989ax8bb-nlc-b8989'}, (error, value) => {
+nlc.remove({
+    classifier_id: 'aa989ax8bb-nlc-b8989'
+}, (error, value) => {
     if (error) {
         console.log('error:', error);
     } else {
@@ -296,20 +346,60 @@ nlc.status({classifier_id: 'aa989ax8bb-nlc-b8989'}, (error, value) => {
     }
 });
 ```
-実行結果を以下に示します。
 
+第1パラメータ params のプロパティを以下に示します。
 
+|Property	  |Type         |Description |
+|:------------|:------------|:-----------|
+|classifier_id|string       |Classifier ID。未設定時は Error('Missing required parameters: classifier_id') をスローします。|
+
+実行結果の例を以下に示します。
+
+- 正常ケース
+    - error: null
+    - value:
+    
+        ```
+        {}
+        ```
+
+- エラーケース: サービス資格情報 (url) のユーザー名またはパスワードが間違っている
+    - error:
+    
+        ```
+        {
+          code: 401,
+          error: 'Not Authorized'
+        }
+        ```
+        
+    - value: null
+
+- エラーケース: 指定した Classifier が存在しない
+    - error:
+    
+        ```
+        {
+          code: 404,
+          error: 'Not found',
+          description: 'Classifier not found.'
+        }
+        ```
+        
+    - value: null
 
 [API Reference](#api-reference)
 
 ---
 
-### classify(params, [callback])
-
-Classifier 情報を取得する。
+## classify(params, [callback])
+テキストをクラス分類します。
 
 ```javascript
-nlc.status({classifier_id: 'aa989ax8bb-nlc-b8989'}, (error, value) => {
+nlc.classify({
+    classifier_id: '85dfc9x224-nlc-2804',
+    text: 'こんにちは'
+}, (error, value) => {
     if (error) {
         console.log('error:', error);
     } else {
@@ -317,78 +407,114 @@ nlc.status({classifier_id: 'aa989ax8bb-nlc-b8989'}, (error, value) => {
     }
 });
 ```
-実行結果を以下に示します。
 
+第1パラメータ params のプロパティを以下に示します。
 
+|Property	  |Type         |Description |
+|:------------|:------------|:-----------|
+|classifier_id|string       |Classifier ID。未設定時は Error('Missing required parameters: classifier_id') をスローします。|
+
+実行結果の例を以下に示します。
+
+- 正常ケース: クラス総数が10件以上
+    - error: null
+    - value:
+    
+        ```
+        {
+          classifier_id: '85dfc9x224-nlc-2804',
+          url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/85dfc9x224-nlc-2804',
+          text: 'こんにちは',
+          top_class: 'general_hello',
+          classes: [
+            {
+              class_name: 'general_hello',
+              confidence: 1
+            },
+            {
+              class_name: 'general_bye',
+              confidence: 0
+            },
+            {
+              class_name: 'general_whoareyou',
+              confidence: 0
+            },
+            {
+              class_name: 'general_thanks',
+              confidence: 0
+            },
+            {
+              class_name: 'diet_stop',
+              confidence: 0
+            },
+            {
+              class_name: 'diet_undou',
+              confidence: 0
+            },
+            {
+              class_name: 'general_howareyou',
+              confidence: 0
+            },
+            {
+              class_name: 'diet_kogao',
+              confidence: 0
+            },
+            {
+              class_name: 'diet_lowerbody',
+              confidence: 0
+            },
+            {
+              class_name: 'diet_eiyou',
+              confidence: 0
+            }
+          ]
+        }
+        ```
+
+- 正常ケース: クラス総数が10件未満 (例は1クラス)
+    - error: null
+    - value:
+    
+        ```
+        {
+          classifier_id: '6a3354x218-nlc-19705',
+          url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/6a3354x218-nlc-19705',
+          text: 'こんにちは',
+          top_class: 'diet_carbocut',
+          classes: [
+            {
+              class_name: 'diet_carbocut',
+              confidence: 1
+            }
+          ]
+        }
+        ```
+        
+- エラーケース: サービス資格情報 (url) のユーザー名またはパスワードが間違っている
+    - error:
+    
+        ```
+        {
+          code: 401,
+          error: 'Not Authorized'
+        }
+        ```
+        
+    - value: null
+
+- エラーケース: 指定した Classifier が存在しない
+    - error:
+    
+        ```
+        {
+          code: 404,
+          error: 'Not found',
+          description: 'Classifier not found.'
+        }
+        ```
+        
+    - value: null
 
 [API Reference](#api-reference)
 
 ---
-
-
-
-
-status, classifier, remove
-```json
-{
- code: 404,
-  error: 'Not found',
-  description: 'Classifier not found.'
-}
-```
-
-
-
-
-## status
-Availableを返す
-
-```json
-{
-  classifier_id: '6a25a7x216-nlc-19811',
-  name: 'name',
-  language: 'ja',
-  created: '2017-09-16T14:27:00.544Z',
-  url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/6a25a7x216-nlc-19811',
-  status: 'Available',
-  status_description: 'The classifier instance is now available and is ready to take classifier requests.'
-  }
-```
-
-
-
-## remove
-```json
-{}
-```
-
-## classify
-```json
-{
-  classifier_id: '85dfc9x224-nlc-2804',
-  url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/85dfc9x224-nlc-2804',
-  text: 'こんにちは',
-  top_class: 'general_hello',
-  classes: [
-     { class_name: 'general_hello', confidence: 1 },
-     { class_name: 'general_bye', confidence: 0 },
-     { class_name: 'general_whoareyou', confidence: 0 },
-     { class_name: 'general_thanks', confidence: 0 },
-     { class_name: 'diet_stop', confidence: 0 },
-     { class_name: 'diet_undou', confidence: 0 },
-     { class_name: 'general_howareyou', confidence: 0 },
-     { class_name: 'diet_kogao', confidence: 0 },
-     { class_name: 'diet_lowerbody', confidence: 0 },
-     { class_name: 'diet_eiyou', confidence: 0 }
-  ]
-}
-```
-
-クラスが1つしかない場合は1クラス。最小クラス数、最大10クラスの回答
-```json
-{ classifier_id: '6a3354x218-nlc-19705',
-  url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/6a3354x218-nlc-19705',
-  text: 'こんにちは',
-  top_class: 'diet_carbocut',
-  classes: [ { class_name: 'diet_carbocut', confidence: 1 } ] }
-```

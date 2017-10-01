@@ -2,6 +2,9 @@
 
 [![NPM](https://nodei.co/npm/watson-nlc-stub.png)](https://nodei.co/npm/watson-nlc-stub/)
 
+[![Build Status](https://travis-ci.org/ippei0605/watson-nlc-stub.svg?branch=master)](https://travis-ci.org/ippei0605/watson-nlc-stub)
+[![codecov](https://codecov.io/gh/ippei0605/watson-nlc-stub/branch/master/graph/badge.svg)](https://codecov.io/gh/ippei0605/watson-nlc-stub)
+
 ## はじめに
 Watson Natural Language Classifier は自然言語分類してくれる素晴らしいサービスですが、個人使用となりますと高額なサービスだと思います。
 * ¥2,100.00 JPY/Classifier per month

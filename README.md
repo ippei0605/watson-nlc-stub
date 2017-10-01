@@ -8,7 +8,7 @@
 ## はじめに
 Watson Natural Language Classifier は自然言語分類してくれる素晴らしいサービスですが、個人使用となりますと高額なサービスだと思います。
 * ¥2,100.00 JPY/Classifier per month
-* ¥0.3675 JPY/ API call (1000 API calls free per month)
+* ¥0.3675 JPY/ API call (1,000 API calls free per month)
 * ¥315.00 JPY/ Training (4 Training Events free per month)
 
 そこで、開発中はなるべく費用がかからないよう、且つ、それなりの動作をするスタブを開発しました。  

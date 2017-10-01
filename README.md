@@ -74,7 +74,7 @@ const NaturalLanguageClassifierV1 = require('watson-nlc-stub');
 const nlc = new NaturalLanguageClassifierV1(creds);
 ```
 
-[API Reference に戻る](#api-reference)
+[API Reference](#api-reference)
 
 ---
 
@@ -95,86 +95,103 @@ nlc.create({
 });
 ```
 
-パラメータを以下に示します。
+第1パラメータ params のプロパティを以下に示します。
 
-|Parameter	  |Type         |Description |
+|Property	  |Type         |Description |
 |:------------|:------------|:-----------|
 |language     |string       |'ja' などを指定してください。スタブの動作としては意味はありません。ない場合は Error('Missing required parameters: language') をスローします。|
 |name         |string       |ない場合は null になります。|
 |training_data|file / string|ReadStream をない場合は Error('Missing required parameters: training_data') をスローします。
 
+実行結果の例を以下に示します。
 
-if (!params.language) throw new ;
-        if (!params.training_data) throw new 
+- 正常ケース
+    - error: null
+    - value:
+    
+        ```
+        {
+          classifier_id: '6a3354x218-nlc-19668',
+          name: 'name',
+          language: 'ja',
+          created: '2017-09-16T14:25:17.255Z',
+          url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/6a3354x218-nlc-19668',
+          status: 'Training',
+          status_description: 'The classifier instance is in its training phase, not yet ready to accept classify requests'
+        }
+        ```
+- エラーケース: 9個目をcreate 
+    - error: 
 
-実行結果を以下に示します。
+        ```
+        {
+          code: 400,
+          error: 'Entitlement error',
+          description: 'This user or service instance has the maximum number of classifiers.'
+        }
+        ```
+    - value: null
 
-```json
-{
-  classifier_id: '6a3354x218-nlc-19668',
-  name: 'name',
-  language: 'ja',
-  created: '2017-09-16T14:25:17.255Z',
-  url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/6a3354x218-nlc-19668',
-  status: 'Training',
-  status_description: 'The classifier instance is in its training phase, not yet ready to accept classify requests'
-}
-```
+- エラーケース: 学習データが5件未満 
+    - error: 
 
-9個目をcreate しようとするとエラー
-````json
-{
-  code: 400,
-  error: 'Entitlement error',
-  description: 'This user or service instance has the maximum number of classifiers.'
-}
-````
+        ```
+        {
+          code: 400,
+          error: 'Data too small',
+          description: 'The number of training entries received = 2, which is smaller than the required minimum of 5'
+        }
+        ```
+    - value: null
 
-データが少ない、５行ならOK
-```json
-{
-  code: 400,
-  error: 'Data too small',
-  description: 'The number of training entries received = 2, which is smaller than the required minimum of 5' }
+- エラーケース: 行頭が空 
+    - error:
+    
+        ```
+        {
+          code: 400,
+          error: 'Malformed data',
+          description: 'The \'training entry\' value at line 1 and column 1 is \'empty\'.'
+        }
+        ```
+    - value: null
 
-```
+- エラーケース: 学習データが15,001件以上 (本家 watson-developer-cloud は 15,002件で以下のエラーになります。)
+    - error:
+    
+        ```
+        {
+          code: 400,
+          error: 'Too many data instances',
+          description: 'The number of training entries received = 15,001, which is larger than the permitted maximum of 15,000'
+        }
+        ```
+    - value: null
+        
+- エラーケース: 学習データのテキストに1,025文字以上のデータが1つ以上存在
+    - error:
 
+        ```
+        {
+          code: 400,
+          error: 'Phrase too long',
+          description: 'The phrase at line 1 has 1,025 characters which is larger than the permitted maximum of 1,024 characters.'
+        }
+        ```
+    - value: null
 
-code: 400,
-  error: 'Malformed data',
-  description: 'The \'training entry\' value at line 15,000 and column 1 is \'empty\'.' }
+- エラーケース: サービス資格情報 (url) のユーザー名またはパスワードが間違っている
+    - error:
 
+        ```
+        {
+          code: 401,
+          error: 'Not Authorized' 
+        }
+        ```
+    - value: null
 
-本物は watson-developer-cloud は15002 で以下のエラーになります。バグじゃないかな？
-スタブは15001でエラーとしています。
-
-
- ```json
-{
-  code: 400,
-  error: 'Too many data instances',
-  description: 'The number of training entries received = 15,001, which is larger than the permitted maximum of 15,000'
-}
-```
-
-
-```json
-{ code: 400,
-  error: 'Phrase too long',
-  description: 'The phrase at line 1 has 1,025 characters which is larger than the permitted maximum of 1,024 characters.' }
-
-```
-
-
-
-* サービス資格情報 (url) のユーザー名またはパスワードが間違っている場合
-    - エラー (error)
-    ```
-    { code: 401, error: 'Not Authorized' }
-    ```
-    - 結果 (value): null
-
-[目次に戻る](#table-of-contents)
+[API Reference](#api-reference)
 
 ---
 
@@ -191,43 +208,57 @@ nlc.list({}, (error, value) => {
 });
 ```
 
-パラメータを以下に示します。
-* なし
+第1パラメータ params は {} を指定してください。
 
-実行結果を以下に示します。
+実行結果の例を以下に示します。
+- 正常ケース: Classifier が１つも存在しない
+    - error: null
+    - value:
+    
+        ```
+        {
+          classifiers: []
+        }
+        ```
 
-* Classifier が１つも存在しない場合
-    - エラー (error): null
-    - 結果 (value)
-    ```
-    { classifiers: [] }
-    ```
-* Classifier が1つ以上存在する場合
-    - エラー (error): null
-    - 結果 (value)
-    ```
-    { classifiers:
-       [ { classifier_id: '8999a8xa9a-nlc-888ab',
-           url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/8999a8xa9a-nlc-888ab',
-           name: 'watson-diet-trainer',
-           language: 'ja',
-           created: '2017-09-18T14:50:34.915Z' },
-         { classifier_id: 'ab9a98x8ba-nlc-9b9aa',
-           url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/ab9a98x8ba-nlc-9b9aa',
-           name: 'watson-diet-trainer-test',
-           language: 'ja',
-           created: '2017-09-18T14:51:05.812Z' } ] }
+- 正常ケース: Classifier が1つ以上存在する
+    - error: null
+    - value:
+    
+        ```
+        {
+          classifiers: [
+            {
+              classifier_id: '8999a8xa9a-nlc-888ab',
+              url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/8999a8xa9a-nlc-888ab',
+              name: 'watson-diet-trainer',
+              language: 'ja',
+              created: '2017-09-18T14:50:34.915Z'
+            },
+            {
+              classifier_id: 'ab9a98x8ba-nlc-9b9aa',
+              url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/ab9a98x8ba-nlc-9b9aa',
+              name: 'watson-diet-trainer-test',
+              language: 'ja',
+              created: '2017-09-18T14:51:05.812Z'
+            }
+          ]
+        }
+        ```
 
-    ```
+- エラーケース: サービス資格情報 (url) のユーザー名またはパスワードが間違っている
+    - error:
+    
+        ```
+        {
+          code: 401,
+          error: 'Not Authorized'
+        }
+        ```
+        
+    - value: null
 
-* サービス資格情報 (url) のユーザー名またはパスワードが間違っている場合
-    - エラー (error)
-    ```
-    { code: 401, error: 'Not Authorized' }
-    ```
-    - 結果 (value): null
-
-[目次に戻る](#table-of-contents)
+[API Reference](#api-reference)
 
 ---
 
@@ -248,7 +279,7 @@ nlc.status({classifier_id: 'aa989ax8bb-nlc-b8989'}, (error, value) => {
 
 
 
-[目次に戻る](#table-of-contents)
+[API Reference](#api-reference)
 
 ---
 
@@ -269,7 +300,7 @@ nlc.status({classifier_id: 'aa989ax8bb-nlc-b8989'}, (error, value) => {
 
 
 
-[目次に戻る](#table-of-contents)
+[API Reference](#api-reference)
 
 ---
 
@@ -290,7 +321,7 @@ nlc.status({classifier_id: 'aa989ax8bb-nlc-b8989'}, (error, value) => {
 
 
 
-[目次に戻る](#table-of-contents)
+[API Reference](#api-reference)
 
 ---
 

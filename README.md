@@ -43,6 +43,7 @@ const creds = {
 次のサービスを使用してください。
 * IBM Bluemix
     - Cloudant NoSQL DB
+        - Lite プランの場合は制限を超えるとエラーになります。 20 Lookups/sec, 10 Writes/sec, 5 Queries/sec        
 * Node.js
     - 6 以上
 
@@ -62,6 +63,9 @@ $ npm install watson-nlc-stub
     - [constructor(creds)](#constructorcreds)
     - [create(params, [callback])](#createparams-callback)
     - [list(params, [callback])](#listparams-callback)
+    - [status(params, [callback])](#statusparams-callback)
+    - [remove(params, [callback])](#removeparams-callback)
+    - [classify(params, [callback])](#classifyparams-callback)
 
 
 ## APIs
@@ -251,6 +255,49 @@ nlc.status({classifier_id: 'aa989ax8bb-nlc-b8989'}, (error, value) => {
 [目次に戻る](#table-of-contents)
 
 ---
+
+### remove(params, [callback])
+
+Classifier 情報を取得する。
+
+```javascript
+nlc.status({classifier_id: 'aa989ax8bb-nlc-b8989'}, (error, value) => {
+    if (error) {
+        console.log('error:', error);
+    } else {
+        console.log(value);
+    }
+});
+```
+実行結果を以下に示します。
+
+
+
+[目次に戻る](#table-of-contents)
+
+---
+
+### classify(params, [callback])
+
+Classifier 情報を取得する。
+
+```javascript
+nlc.status({classifier_id: 'aa989ax8bb-nlc-b8989'}, (error, value) => {
+    if (error) {
+        console.log('error:', error);
+    } else {
+        console.log(value);
+    }
+});
+```
+実行結果を以下に示します。
+
+
+
+[目次に戻る](#table-of-contents)
+
+---
+
 
 
 

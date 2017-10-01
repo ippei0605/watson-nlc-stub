@@ -5,7 +5,7 @@ node_modules
 out
 
 # istanbul の出力先
-coverage/
+coverage
 
 # 設定ファイル
 .idea

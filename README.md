@@ -57,18 +57,14 @@ $ npm install watson-nlc-stub
     - https://www.npmjs.com/package/watson-developer-cloud
 
 ---
-<a name="table-of-contents"></a>
-## 目次
-* [APIs](#apis)
-    - [constructor(creds)](#constructorcreds)
-    - [create(params, [callback])](#createparams-callback)
-    - [list(params, [callback])](#listparams-callback)
-    - [status(params, [callback])](#statusparams-callback)
-    - [remove(params, [callback])](#removeparams-callback)
-    - [classify(params, [callback])](#classifyparams-callback)
 
-
-## APIs
+## API Reference
+* [constructor(creds)](#constructorcreds)
+* [create(params, [callback])](#createparams-callback)
+* [list(params, [callback])](#listparams-callback)
+* [status(params, [callback])](#statusparams-callback)
+* [remove(params, [callback])](#removeparams-callback)
+* [classify(params, [callback])](#classifyparams-callback)
 
 ### constructor(creds)
 スタブを生成します。watson-developer-cloud の名前に合わせて、次のように生成すると良いと思います。
@@ -78,7 +74,7 @@ const NaturalLanguageClassifierV1 = require('watson-nlc-stub');
 const nlc = new NaturalLanguageClassifierV1(creds);
 ```
 
-[目次に戻る](#table-of-contents)
+[API Reference に戻る](#api-reference)
 
 ---
 

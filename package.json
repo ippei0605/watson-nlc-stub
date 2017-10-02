@@ -1,6 +1,6 @@
 {
   "name": "watson-nlc-stub",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Watson NLC Stub",
   "author": "Ippei SUZUKI",
   "repository": {
@@ -16,8 +16,7 @@
   },
   "dependencies": {
     "cloudant": "^1.8.0",
-    "moment": "^2.18.1",
-    "watson-developer-cloud": "^2.39.0"
+    "moment": "^2.18.1"
   },
   "devDependencies": {
     "chai": "^4.1.2",

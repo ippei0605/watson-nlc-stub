@@ -101,7 +101,7 @@ nlc.create({
 |:------------|:------------|:-----------|
 |language     |string       |'ja' などを指定してください。スタブの動作としては意味はありません。未設定時は Error('Missing required parameters: language') をスローします。|
 |name         |string       |未設定時は null をセットします。|
-|training_data|file / string|学習データ。(file は readStream) 未設定時はは Error('Missing required parameters: training_data') をスローします。
+|training_data|file / string|学習データ。(file は readStream) 未設定時は Error('Missing required parameters: training_data') をスローします。
 
 実行結果の例を以下に示します。
 

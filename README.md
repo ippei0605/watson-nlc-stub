@@ -70,7 +70,7 @@ watson-developer-cloud の次回メジャーリリースでメソッドが変更
 
 ## API Reference
 * [constructor(creds)](#constructorcreds)
-* [createClassifier(params, [callback])](#ccreateclassifierparams-callback)
+* [createClassifier(params, [callback])](#createclassifierparams-callback)
 * [listClassifiers(params, [callback])](#listclassifiersparams-callback)
 * [getClassifier(params, [callback])](#getclassifierparams-callback)
 * [deleteClassifier(params, [callback])](#deleteclassifierparams-callback)

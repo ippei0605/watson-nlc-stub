@@ -7,7 +7,7 @@
 
 // モジュールを読込む。
 const
-    Cloudant = require('cloudant'),
+    Cloudant = require('@cloudant/cloudant'),
     moment = require('moment');
 
 // マップ定義: Classifier 一覧を取得
@@ -39,11 +39,30 @@ const designDoc = {
 /**
  * Cloudant NoSQL DB サービス
  * @typedef {object} cloudant
- * @property {object} db
+ * @property {object} db データベース
+ */
+
+/**
+ * Cloudant NoSQL DB サービス資格情報 + データベース名
+ * @typedef {object} creds
+ * @property {string} host ホスト名
+ * @property {string} password パスワード
+ * @property {number} port ポート
+ * @property {string} url URL
+ * @property {string} username ユーザー名
+ * @property {string} dbname データベース名
  */
 
 const initDatabase = (creds) => {
-    const cloudant = new Cloudant(creds.url);
+    const cloudant = new Cloudant({
+        url: creds.url,
+        maxAttempt: 5,
+        plugins: {
+            retry: {
+                retryStatusCodes: [429]
+            }
+        }
+    });
     cloudant.db.get(creds.dbname, (error) => {
         if (error && error.error === 'not_found') {
             cloudant.db.create(creds.dbname, (error) => {
@@ -140,9 +159,7 @@ const insert = (nlc, params, csv, callback) => {
 
         if (!isError) {
             const
-                classifier_id = '??????x???-nlc-?????'.replace(/[?]/g, (c) => {
-                    return Math.floor(Math.random() * 0xF).toString(16);
-                }),
+                classifier_id = '??????x???-nlc-?????'.replace(/[?]/g, () => Math.floor(Math.random() * 0xF).toString(16)),
                 url = `https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/${classifier_id}`,
                 created = moment.utc().format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]'),
                 name = params.name ? params.name : null;
@@ -175,13 +192,61 @@ class NlcStub {
     /**
      * コンストラクター
      * @classdesc Q&A モデル
-     * @param creds {object} Cloudant NoSQL DB のサービス資格情報 + データベース名 (dbname)
+     * @param creds {creds} Cloudant NoSQL DB のサービス資格情報 + データベース名 (dbname)
      */
     constructor (creds) {
         /**
          * NLC データベース
          */
         this.nlc = initDatabase(creds);
+    }
+
+    // noinspection JSUnusedGlobalSymbols
+    /**
+     * Classifier 一覧を取得する。
+     * @param params {object} パラメータ
+     * @param callback {listCallback} コールバック
+     * @deprecated list() was renamed to listClassifiers(). Support for list() will be removed in the next major release
+     */
+    list (params, callback) {
+        console.warn('WARNING: list() was renamed to listClassifiers(). Support for list() will be removed in the next major release');
+        this.listClassifiers(params, callback);
+    }
+
+    // noinspection JSUnusedGlobalSymbols
+    /**
+     * Classifier 情報を取得する。
+     * @param params {object} パラメータ
+     * @param callback {nlcCallback} コールバック
+     * @deprecated status() was renamed to getClassifier(). Support for status() will be removed in the next major release
+     */
+    status (params, callback) {
+        console.warn('WARNING: status() was renamed to getClassifier(). Support for status() will be removed in the next major release');
+        this.getClassifier(params, callback);
+    }
+
+    // noinspection JSUnusedGlobalSymbols
+    /**
+     * Classifier を削除する。
+     * @param params {object} パラメータ
+     * @param callback {nlcCallback} コールバック
+     * @deprecated remove() was renamed to deleteClassifier(). Support for remove() will be removed in the next major release
+     */
+    remove (params, callback) {
+        console.warn('WARNING: remove() was renamed to deleteClassifier(). Support for remove() will be removed in the next major release');
+        this.deleteClassifier(params, callback);
+    }
+
+    // noinspection JSUnusedGlobalSymbols
+    /**
+     * Classifier を作成する。
+     * @param params {object} パラメータ
+     * @param callback {nlcCallback} コールバック
+     * @deprecated create() was renamed to createClassifier(). Support for create() will be removed in the next major release
+     */
+    create (params, callback) {
+        console.warn('WARNING: create() was renamed to createClassifier(). Support for create() will be removed in the next major release');
+        this.createClassifier(params, callback);
     }
 
     /**
@@ -191,33 +256,38 @@ class NlcStub {
      * @param {object} value 結果
      */
 
-    // noinspection JSUnusedLocalSymbols
+    /**
+     * Classifier 一覧を取得した後にコールバックする。
+     * @callback listCallback
+     * @param error {object} エラー
+     * @param value {object} 結果
+     * @property value.classifiers {object[]} Classifier 一覧
+     */
+
     /**
      * Classifier 一覧を取得する。
      * @param params {object} パラメータ
-     * @param callback {nlcCallback} コールバック
+     * @param callback {listCallback} コールバック
      */
-    list (params, callback) {
-        // noinspection Annotator
+    listClassifiers (params, callback) {
         this.nlc.view('classifiers', 'list', (error, value) => {
             if (error) {
                 console.log('error:', error);
                 checkUnauthorized(error, callback);
             } else {
-                const classifiers = value.rows.map((row) => {
-                    return row.value;
-                });
+                const classifiers = value.rows.map(row => row.value);
                 execCallback(callback, null, {classifiers: classifiers});
             }
         });
     }
 
+    // noinspection JSUnusedGlobalSymbols
     /**
      * Classifier 情報を取得する。
      * @param params {object} パラメータ
      * @param callback {nlcCallback} コールバック
      */
-    status (params, callback) {
+    getClassifier (params, callback) {
         // パラメータをチェックする。
         if (!params.classifier_id) throw new Error('Missing required parameters: classifier_id');
 
@@ -241,24 +311,13 @@ class NlcStub {
         });
     }
 
-    /**
-     * @typedef {object} Document
-     * @property {string} _id
-     * @property {string} _rev
-     * @property {string} type
-     * @property {string} url
-     * @property {string} name
-     * @property {string} language
-     * @property {string} created
-     * @property {object} classes
-     */
-
+    // noinspection JSUnusedGlobalSymbols
     /**
      * Classifier を削除する。
      * @param params {object} パラメータ
      * @param callback {nlcCallback} コールバック
      */
-    remove (params, callback) {
+    deleteClassifier (params, callback) {
         // パラメータをチェックする。
         if (!params.classifier_id) throw new Error('Missing required parameters: classifier_id');
 
@@ -269,7 +328,6 @@ class NlcStub {
                 checkUnauthorized(error, callback);
                 checkNotFound(error, callback);
             } else {
-                /** @type {Document} */
                 this.nlc.destroy(value._id, value._rev, () => {
                     execCallback(callback, null, {});
                 });
@@ -277,41 +335,42 @@ class NlcStub {
         });
     }
 
+    // noinspection JSUnusedGlobalSymbols
     /**
      * Classifier を作成する。
      * @param params {object} パラメータ
      * @param callback {nlcCallback} コールバック
      */
-    create (params, callback) {
+    createClassifier (params, callback) {
         // パラメータをチェックする。
         if (!params.language) throw new Error('Missing required parameters: language');
         if (!params.training_data) throw new Error('Missing required parameters: training_data');
 
+        // noinspection JSDeprecatedSymbols
         this.list({}, (error, value) => {
-                if (error) {
-                    execCallback(callback, error, null);
-                } else if (value.classifiers.length < 8) {
-                    if (typeof params.training_data === 'string') {
-                        insert(this.nlc, params, params.training_data, callback);
-                    } else {
-                        let csv = '';
-                        params.training_data.on('data', (data) => {
-                            csv += data;
-                        });
-
-                        params.training_data.on('end', () => {
-                            insert(this.nlc, params, csv, callback);
-                        });
-                    }
+            if (error) {
+                execCallback(callback, error, null);
+            } else if (value.classifiers.length < 8) {
+                if (typeof params.training_data === 'string') {
+                    insert(this.nlc, params, params.training_data, callback);
                 } else {
-                    execCallback(callback, {
-                        code: 400,
-                        error: 'Entitlement error',
-                        description: 'This user or service instance has the maximum number of classifiers.'
-                    }, null);
+                    let csv = '';
+                    params.training_data.on('data', (data) => {
+                        csv += data;
+                    });
+
+                    params.training_data.on('end', () => {
+                        insert(this.nlc, params, csv, callback);
+                    });
                 }
+            } else {
+                execCallback(callback, {
+                    code: 400,
+                    error: 'Entitlement error',
+                    description: 'This user or service instance has the maximum number of classifiers.'
+                }, null);
             }
-        );
+        });
     }
 
     /**
@@ -346,10 +405,8 @@ class NlcStub {
                     });
                 }
                 temp.sort((a, b) => {
-                    if (a.confidence > b.confidence)
-                        return -1;
-                    if (a.confidence < b.confidence)
-                        return 1;
+                    if (a.confidence > b.confidence) return -1;
+                    if (a.confidence < b.confidence) return 1;
                     return 0;
                 });
                 if (temp.length > 10) {

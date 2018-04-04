@@ -43,7 +43,7 @@ const creds = {
 次のサービスを使用してください。
 * IBM Bluemix
     - Cloudant NoSQL DB
-        - Lite プランの場合は制限を超えるとエラーになります。 20 Lookups/sec, 10 Writes/sec, 5 Queries/sec        
+        - 制限 (20 Lookups/sec, 10 Writes/sec, 5 Queries/sec) を超えた場合はリトライします。 (500ms 間隔で最大5回実行)
 * Node.js
     - 6 以上
 

@@ -12,7 +12,7 @@
 // モジュールを読込む。
 const
     chai = require('chai'),
-    Cloudant = require('cloudant'),
+    Cloudant = require('@cloudant/cloudant'),
     fs = require('fs'),
     NaturalLanguageClassifierV1 = require('../index');
 

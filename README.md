@@ -11,13 +11,13 @@ Watson Natural Language Classifier は自然言語分類してくれる素晴ら
 * ¥0.3675 JPY/ API call (1,000 API calls free per month)
 * ¥315.00 JPY/ Training (4 Training Events free per month)
 
-そこで、開発中はなるべく費用がかからないよう、且つ、それなりの動作をするスタブを開発しました。  
+そこで、開発中はなるべく費用がかからないよう、且つ、それなりの動作をするスタブを開発しました。
 
 ### 使い方
 ```javascript
 const NaturalLanguageClassifierV1 = require('watson-nlc-stub');
 const nlc = new NaturalLanguageClassifierV1(creds);
-nlc.list({}, (error, value) => {
+nlc.listClassifiers({}, (error, value) => {
     if (error) {
         console.log('error:', error);
     } else {
@@ -45,7 +45,7 @@ const creds = {
     - Cloudant NoSQL DB
         - 制限 (20 Lookups/sec, 10 Writes/sec, 5 Queries/sec) を超えた場合はリトライします。 (500ms 間隔で最大5回実行)
 * Node.js
-    - 6 以上
+    - 8 以上
 
 ### インストール
 ```
@@ -53,17 +53,27 @@ $ npm install watson-nlc-stub
 ```
 
 ### 参考情報
-* watson-developer-cloud
+* watson-developer-cloud (Watson APIs Node.js SDK)
     - https://www.npmjs.com/package/watson-developer-cloud
+
+### 注意
+watson-developer-cloud の次回メジャーリリースでメソッドが変更になるようです。現在は両方のメソッドが使用できますが、 Current method では警告が表示されます。
+
+| Current method | New method       |
+|:---------------|:-----------------|
+| create         | createClassifier |
+| list           | listClassifiers  |
+| status         | getClassifier    |
+| remove         | deleteClassifier |
 
 ---
 
 ## API Reference
 * [constructor(creds)](#constructorcreds)
-* [create(params, [callback])](#createparams-callback)
-* [list(params, [callback])](#listparams-callback)
-* [status(params, [callback])](#statusparams-callback)
-* [remove(params, [callback])](#removeparams-callback)
+* [createClassifier(params, [callback])](#ccreateclassifierparams-callback)
+* [listClassifiers(params, [callback])](#listclassifiersparams-callback)
+* [getClassifier(params, [callback])](#getclassifierparams-callback)
+* [deleteClassifier(params, [callback])](#deleteclassifierparams-callback)
 * [classify(params, [callback])](#classifyparams-callback)
 
 ## constructor(creds)
@@ -78,11 +88,11 @@ const nlc = new NaturalLanguageClassifierV1(creds);
 
 ---
 
-## create(params, [callback])
+## createClassifier(params, [callback])
 Classifier を作成します。
 
 ```javascript
-nlc.create({
+nlc.createClassifier({
     language: 'ja',
     name: 'watson-diet-trainer-test',
     training_data: fs.createReadStream('classifier.csv')
@@ -120,7 +130,7 @@ nlc.create({
           status_description: 'The classifier instance is in its training phase, not yet ready to accept classify requests'
         }
         ```
-- エラーケース: 9個目をcreate 
+- エラーケース: 9個目を createClassifier
     - error: 
 
         ```
@@ -195,11 +205,11 @@ nlc.create({
 
 ---
 
-## list(params, [callback])
+## listClassifiers(params, [callback])
 Classifier の一覧を取得します。
 
 ```javascript
-nlc.list({}, (error, value) => {
+nlc.listClassifiers({}, (error, value) => {
     if (error) {
         console.log('error:', error);
     } else {
@@ -262,12 +272,12 @@ nlc.list({}, (error, value) => {
 
 ---
 
-## status(params, [callback])
+## getClassifier(params, [callback])
 
 Classifier 情報を取得します。ステータスは Available (固定値) を返します。
 
 ```javascript
-nlc.status({
+nlc.getClassifier({
     classifier_id: 'aa989ax8bb-nlc-b8989'
 }, (error, value) => {
     if (error) {
@@ -331,12 +341,12 @@ nlc.status({
 
 ---
 
-## remove(params, [callback])
+## deleteClassifier(params, [callback])
 
 Classifier を削除します。
 
 ```javascript
-nlc.remove({
+nlc.deleteClassifier({
     classifier_id: 'aa989ax8bb-nlc-b8989'
 }, (error, value) => {
     if (error) {

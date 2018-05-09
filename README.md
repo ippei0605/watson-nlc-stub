@@ -93,8 +93,10 @@ Classifier を作成します。
 
 ```javascript
 nlc.createClassifier({
-    language: 'ja',
-    name: 'watson-diet-trainer-test',
+    metadata: JSON.stringify({
+        name: 'watson-diet-trainer-test',
+        language: 'ja'
+    }),
     training_data: fs.createReadStream('classifier.csv')
 }, (error, value) => {
     if (error) {
@@ -109,8 +111,7 @@ nlc.createClassifier({
 
 |Property	  |Type         |Description |
 |:------------|:------------|:-----------|
-|language     |string       |'ja' などを指定してください。スタブの動作としては意味はありません。未設定時は Error('Missing required parameters: language') をスローします。|
-|name         |string       |未設定時は null をセットします。|
+|metadata     |string       |メタデータ。name と language を含んだJSON形式。未設定時は Error('Missing required parameters: training_data') を、JSONパースできない場合は Error('Missing metadata') をスローします。|
 |training_data|file / string|学習データ。(file は readStream) 未設定時は Error('Missing required parameters: training_data') をスローします。
 
 実行結果の例を以下に示します。

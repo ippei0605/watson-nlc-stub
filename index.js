@@ -246,8 +246,6 @@ class NlcStub {
     create (params, callback) {
         console.warn('WARNING: create() was renamed to createClassifier(). Support for create() will be removed in the next major release');
         // watson-developer-cloud API変更に伴うパラメータ追加
-        // noinspection JSUndefinedPropertyAssignment
-        params.metadata = JSON.stringify({language: params.language});
         this.createClassifier(params, callback);
     }
 
@@ -347,10 +345,10 @@ class NlcStub {
         // パラメータをチェックする。
         if (!params.metadata) throw new Error('Missing required parameters: metadata');
         if (!params.training_data) throw new Error('Missing required parameters: training_data');
-        if (!params.metadata) throw new Error('Missing required parameters: metadata');
 
         let name, language;
         try {
+            // noinspection JSCheckFunctionSignatures
             const metadata = JSON.parse(params.metadata);
             name = metadata.name;
             language = metadata.language;

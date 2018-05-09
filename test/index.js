@@ -38,7 +38,7 @@ describe('constructor', () => {
         nlc = new NaturalLanguageClassifierV1(creds);
         setTimeout(() => {
             done();
-        }, 2000)
+        }, 2000);
     });
 
     it('new 認証エラーが発生するオブジェク', (done) => {
@@ -72,14 +72,28 @@ describe('list', () => {
 });
 
 describe('create', () => {
-    it('Missing required parameters: language', (done) => {
+    it('Missing required parameters: metadata', (done) => {
         try {
             nlc.create({
-                name: 'watson-diet-trainer',
                 training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
             });
         } catch (e) {
-            assert.equal('Missing required parameters: language', e.message);
+            assert.equal('Missing required parameters: metadata', e.message);
+            done();
+        }
+    });
+
+    it('Missing metadata', (done) => {
+        try {
+            nlc.create({
+                metadata: {
+                    name: 'watson-diet-trainer',
+                    language: 'ja'
+                },
+                training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
+            });
+        } catch (e) {
+            assert.equal('Missing metadata', e.message);
             done();
         }
     });
@@ -87,8 +101,10 @@ describe('create', () => {
     it('Missing required parameters: training_data', (done) => {
         try {
             nlc.create({
-                language: 'ja',
-                name: 'watson-diet-trainer'
+                metadata: JSON.stringify({
+                    name: 'watson-diet-trainer',
+                    language: 'ja'
+                })
             });
         } catch (e) {
             assert.equal('Missing required parameters: training_data', e.message);
@@ -98,8 +114,10 @@ describe('create', () => {
 
     it('classifier first', (done) => {
         nlc.create({
-            language: 'ja',
-            name: 'watson-diet-trainer',
+            metadata: JSON.stringify({
+                name: 'watson-diet-trainer',
+                language: 'ja'
+            }),
             training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
         }, (error, value) => {
             if (error) console.log('error:', error);
@@ -112,14 +130,16 @@ describe('create', () => {
             assert(value.created);
             setTimeout(() => {
                 done();
-            }, 1000)
+            }, 1000);
         });
     });
 
     it('Not Authorized, トレーニングデータ: file', (done) => {
         errorNlc.create({
-            language: 'ja',
-            name: 'watson-diet-trainer',
+            metadata: JSON.stringify({
+                name: 'watson-diet-trainer',
+                language: 'ja'
+            }),
             training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
         }, (error, value) => {
             if (error) console.log('error:', error);
@@ -129,14 +149,16 @@ describe('create', () => {
             assert.equal(null, value);
             setTimeout(() => {
                 done();
-            }, 1000)
+            }, 1000);
         });
     });
 
     it('Data too small, トレーニングデータ: file', (done) => {
         nlc.create({
-            language: 'ja',
-            name: 'watson-diet-trainer',
+            metadata: JSON.stringify({
+                name: 'watson-diet-trainer',
+                language: 'ja'
+            }),
             training_data: fs.createReadStream(`${__dirname}/classifier_3.csv`)
         }, (error, value) => {
             if (error) console.log('error:', error);
@@ -150,8 +172,10 @@ describe('create', () => {
 
     it('Malformed data, トレーニングデータ: string', (done) => {
         nlc.create({
-            language: 'ja',
-            name: 'watson-diet-trainer',
+            metadata: JSON.stringify({
+                name: 'watson-diet-trainer',
+                language: 'ja'
+            }),
             training_data: fs.readFileSync(`${__dirname}/classifier_malformed_data_5.csv`).toString()
         }, (error, value) => {
             if (error) console.log('error:', error);
@@ -165,8 +189,10 @@ describe('create', () => {
 
     it('Too many data instances, トレーニングデータ: file', (done) => {
         nlc.create({
-            language: 'ja',
-            name: 'watson-diet-trainer',
+            metadata: JSON.stringify({
+                name: 'watson-diet-trainer',
+                language: 'ja'
+            }),
             training_data: fs.createReadStream(`${__dirname}/classifier_15001.csv`)
         }, (error, value) => {
             if (error) console.log('error:', error);
@@ -180,8 +206,10 @@ describe('create', () => {
 
     it('Phrase too long, トレーニングデータ: file', (done) => {
         nlc.create({
-            language: 'ja',
-            name: 'watson-diet-trainer',
+            metadata: JSON.stringify({
+                name: 'watson-diet-trainer',
+                language: 'ja'
+            }),
             training_data: fs.createReadStream(`${__dirname}/classifier_phrase_too_long_4.csv`)
         }, (error, value) => {
             if (error) console.log('error:', error);
@@ -195,8 +223,10 @@ describe('create', () => {
 
     it('classifier 2nd', (done) => {
         nlc.create({
-            language: 'ja',
-            name: 'watson-diet-trainer',
+            metadata: JSON.stringify({
+                name: 'watson-diet-trainer',
+                language: 'ja'
+            }),
             training_data: fs.createReadStream(`${__dirname}/classifier_10.csv`)
         }, (error, value) => {
             if (error) console.log('error:', error);
@@ -209,14 +239,16 @@ describe('create', () => {
             assert(value.created);
             setTimeout(() => {
                 done();
-            }, 1000)
+            }, 1000);
         });
     });
 
     it('classifier 3nd', (done) => {
         nlc.create({
-            language: 'ja',
-            name: 'watson-diet-trainer',
+            metadata: JSON.stringify({
+                name: 'watson-diet-trainer',
+                language: 'ja'
+            }),
             training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
         }, (error, value) => {
             if (error) console.log('error:', error);
@@ -228,14 +260,16 @@ describe('create', () => {
             assert(value.created);
             setTimeout(() => {
                 done();
-            }, 1000)
+            }, 1000);
         });
     });
 
     it('classifier 4th', (done) => {
         nlc.create({
-            language: 'ja',
-            name: 'watson-diet-trainer',
+            metadata: JSON.stringify({
+                name: 'watson-diet-trainer',
+                language: 'ja'
+            }),
             training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
         }, (error, value) => {
             if (error) console.log('error:', error);
@@ -247,14 +281,16 @@ describe('create', () => {
             assert(value.created);
             setTimeout(() => {
                 done();
-            }, 1000)
+            }, 1000);
         });
     });
 
     it('classifier 5th', (done) => {
         nlc.create({
-            language: 'ja',
-            name: 'watson-diet-trainer',
+            metadata: JSON.stringify({
+                name: 'watson-diet-trainer',
+                language: 'ja'
+            }),
             training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
         }, (error, value) => {
             if (error) console.log('error:', error);
@@ -266,14 +302,16 @@ describe('create', () => {
             assert(value.created);
             setTimeout(() => {
                 done();
-            }, 1000)
+            }, 1000);
         });
     });
 
     it('classifier 6th', (done) => {
         nlc.create({
-            language: 'ja',
-            name: 'watson-diet-trainer',
+            metadata: JSON.stringify({
+                name: 'watson-diet-trainer',
+                language: 'ja'
+            }),
             training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
         }, (error, value) => {
             if (error) console.log('error:', error);
@@ -285,14 +323,16 @@ describe('create', () => {
             assert(value.created);
             setTimeout(() => {
                 done();
-            }, 1000)
+            }, 1000);
         });
     });
 
     it('classifier 7th', (done) => {
         nlc.create({
-            language: 'ja',
-            name: 'watson-diet-trainer',
+            metadata: JSON.stringify({
+                name: 'watson-diet-trainer',
+                language: 'ja'
+            }),
             training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
         }, (error, value) => {
             if (error) console.log('error:', error);
@@ -304,14 +344,16 @@ describe('create', () => {
             assert(value.created);
             setTimeout(() => {
                 done();
-            }, 1000)
+            }, 1000);
         });
     });
 
     it('classifier 8th', (done) => {
         nlc.create({
-            language: 'ja',
-            name: 'watson-diet-trainer',
+            metadata: JSON.stringify({
+                name: 'watson-diet-trainer',
+                language: 'ja'
+            }),
             training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
         }, (error, value) => {
             if (error) console.log('error:', error);
@@ -324,14 +366,16 @@ describe('create', () => {
             assert(value.created);
             setTimeout(() => {
                 done();
-            }, 2000)
+            }, 2000);
         });
     });
 
     it('Entitlement error', (done) => {
         nlc.create({
-            language: 'ja',
-            name: 'watson-diet-trainer',
+            metadata: JSON.stringify({
+                name: 'watson-diet-trainer',
+                language: 'ja'
+            }),
             training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
         }, (error, value) => {
             if (error) console.log('error:', error);
@@ -390,7 +434,7 @@ describe('remove', () => {
             assert.equal(null, value);
             setTimeout(() => {
                 done();
-            }, 1000)
+            }, 1000);
         });
     });
 });
@@ -444,7 +488,7 @@ describe('classify', () => {
             assert.equal(null, value);
             setTimeout(() => {
                 done();
-            }, 1000)
+            }, 1000);
         });
     });
 
@@ -517,7 +561,7 @@ describe('status', () => {
             assert.equal(null, value);
             setTimeout(() => {
                 done();
-            }, 1000)
+            }, 1000);
         });
     });
 

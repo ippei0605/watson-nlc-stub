@@ -107,7 +107,7 @@ const checkNotFound = (error, callback) => {
     }
 };
 
-const insert = (nlc, params, csv, callback) => {
+const insert = (nlc, name, language, csv, callback) => {
     const
         classes = {},
         line = csv.replace(/\n$/, '').split('\n');
@@ -161,15 +161,14 @@ const insert = (nlc, params, csv, callback) => {
             const
                 classifier_id = '??????x???-nlc-?????'.replace(/[?]/g, () => Math.floor(Math.random() * 0xF).toString(16)),
                 url = `https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/${classifier_id}`,
-                created = moment.utc().format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]'),
-                name = params.name ? params.name : null;
+                created = moment.utc().format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
 
             nlc.insert({
                 _id: classifier_id,
                 type: 'classifier',
                 url: url,
                 name: name,
-                language: params.language,
+                language: language,
                 created: created,
                 classes: classes
             }, (error) => {
@@ -180,7 +179,7 @@ const insert = (nlc, params, csv, callback) => {
                     classifier_id: classifier_id,
                     url: url,
                     name: name,
-                    language: params.language,
+                    language: language,
                     created: created
                 });
             });
@@ -343,8 +342,17 @@ class NlcStub {
      */
     createClassifier (params, callback) {
         // パラメータをチェックする。
-        if (!params.language) throw new Error('Missing required parameters: language');
+        if (!params.metadata) throw new Error('Missing required parameters: metadata');
         if (!params.training_data) throw new Error('Missing required parameters: training_data');
+
+        let name, language;
+        try {
+            const metadata = JSON.parse(params.metadata);
+            name = metadata.name;
+            language = metadata.language;
+        } catch (e) {
+            throw new Error('Missing metadata');
+        }
 
         // noinspection JSDeprecatedSymbols
         this.list({}, (error, value) => {
@@ -352,7 +360,7 @@ class NlcStub {
                 execCallback(callback, error, null);
             } else if (value.classifiers.length < 8) {
                 if (typeof params.training_data === 'string') {
-                    insert(this.nlc, params, params.training_data, callback);
+                    insert(this.nlc, name, language, params.training_data, callback);
                 } else {
                     let csv = '';
                     params.training_data.on('data', (data) => {
@@ -360,7 +368,7 @@ class NlcStub {
                     });
 
                     params.training_data.on('end', () => {
-                        insert(this.nlc, params, csv, callback);
+                        insert(this.nlc, name, language, csv, callback);
                     });
                 }
             } else {

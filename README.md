@@ -61,7 +61,7 @@ watson-developer-cloud の次回メジャーリリースでメソッドが変更
 
 | Current method | New method       |
 |:---------------|:-----------------|
-| create         | createClassifier |
+| create         | createClassifier (* 必須パラメータ `metadata` が追加されてます。) |
 | list           | listClassifiers  |
 | status         | getClassifier    |
 | remove         | deleteClassifier |

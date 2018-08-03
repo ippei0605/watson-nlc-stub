@@ -357,7 +357,7 @@ class NlcStub {
         }
 
         // noinspection JSDeprecatedSymbols
-        this.list({}, (error, value) => {
+        this.listClassifiers({}, (error, value) => {
             if (error) {
                 execCallback(callback, error, null);
             } else if (value.classifiers.length < 8) {

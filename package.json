@@ -1,6 +1,6 @@
 {
   "name": "watson-nlc-stub",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Watson NLC Stub",
   "author": "Ippei SUZUKI",
   "repository": {
@@ -15,14 +15,14 @@
     "codecov": "codecov"
   },
   "dependencies": {
-    "@cloudant/cloudant": "^2.3.0",
-    "moment": "^2.22.2"
+    "@cloudant/cloudant": "^4.0.0",
+    "moment": "^2.24.0"
   },
   "devDependencies": {
-    "chai": "^4.1.2",
-    "codecov": "^3.0.0",
+    "chai": "^4.2.0",
+    "codecov": "^3.4.0",
     "istanbul": "^0.4.5",
-    "jsdoc": "^3.5.5",
-    "mocha": "^5.0.5"
+    "jsdoc": "^3.6.2",
+    "mocha": "^6.1.4"
   }
 }

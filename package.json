@@ -11,18 +11,18 @@
   "main": "./index",
   "scripts": {
     "doc": "jsdoc -c jsdoc-conf.json index.js",
-    "test": "istanbul cover _mocha",
+    "test": "nyc --reporter=lcov mocha",
     "codecov": "codecov"
   },
   "dependencies": {
-    "@cloudant/cloudant": "^4.0.0",
-    "moment": "^2.24.0"
+    "@cloudant/cloudant": "^4.2.2",
+    "moment": "^2.24.0",
+    "nyc": "^14.1.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "codecov": "^3.4.0",
-    "istanbul": "^0.4.5",
-    "jsdoc": "^3.6.2",
-    "mocha": "^6.1.4"
+    "codecov": "^3.6.1",
+    "jsdoc": "^3.6.3",
+    "mocha": "^6.2.2"
   }
 }

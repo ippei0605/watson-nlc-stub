@@ -13,17 +13,23 @@ Watson Natural Language Classifier は自然言語分類してくれる素晴ら
 
 そこで、開発中はなるべく費用がかからないよう、且つ、それなりの動作をするスタブを開発しました。
 
+## バージョンについて
+* 5.0.0 以降は、ibm-watson 5以上のスタブとして動作します。
+* 0.0.9 は、ibm-watson 4 または watson-developer-cloud のスタブとして動作します。
+
+> ibm-watson 5 以降と未満の違いは、第一階層のパラメータがLCCに変更されたことと、コールバックからプロミスに変更されたことです。~~超くだらねー修正で手間取らせやがって、こんちくしょうめ！！~~
+
 ### 使い方
 ```javascript
 const NaturalLanguageClassifierV1 = require('watson-nlc-stub');
 const nlc = new NaturalLanguageClassifierV1(creds);
-nlc.listClassifiers({}, (error, value) => {
-    if (error) {
-        console.log('error:', error);
-    } else {
-        console.log(value);
-    }
-});
+nlc.listClassifiers({})
+  .then(value => {
+    console.log(value);
+  })
+  .catch(error => {
+    console.log('error:', error);
+  });
 ```
 
 > creds は Cloudant NoSQL DB のサービス資格情報にデータベース名 (dbname) を付加した次のようなオブジェクトです。
@@ -53,31 +59,23 @@ $ npm install watson-nlc-stub
 ```
 
 ### 参考情報
+* ibm-watson (Watson APIs Node.js SDK)
+    - https://www.npmjs.com/package/ibm-watson
 * watson-developer-cloud (Watson APIs Node.js SDK)
     - https://www.npmjs.com/package/watson-developer-cloud
-
-### 注意
-watson-developer-cloud の次回メジャーリリースでメソッドが変更になるようです。現在は両方のメソッドが使用できますが、 Current method では警告が表示されます。
-
-| Current method | New method       |
-|:---------------|:-----------------|
-| create         | createClassifier (* 必須パラメータ `metadata` が追加されてます。) |
-| list           | listClassifiers  |
-| status         | getClassifier    |
-| remove         | deleteClassifier |
 
 ---
 
 ## API Reference
 * [constructor(creds)](#constructorcreds)
-* [createClassifier(params, [callback])](#createclassifierparams-callback)
-* [listClassifiers(params, [callback])](#listclassifiersparams-callback)
-* [getClassifier(params, [callback])](#getclassifierparams-callback)
-* [deleteClassifier(params, [callback])](#deleteclassifierparams-callback)
-* [classify(params, [callback])](#classifyparams-callback)
+* [createClassifier(params)](#createclassifierparams)
+* [listClassifiers(params)](#listclassifiersparams)
+* [getClassifier(params)](#getclassifierparams)
+* [deleteClassifier(params)](#deleteclassifierparams)
+* [classify(params)](#classifyparams)
 
 ## constructor(creds)
-スタブを生成します。watson-developer-cloud の名前に合わせて、次のように生成すると良いと思います。
+スタブを生成します。ibm-watson の名前に合わせて、次のように生成すると良いと思います。
 
 ```javascript
 const NaturalLanguageClassifierV1 = require('watson-nlc-stub');
@@ -88,36 +86,35 @@ const nlc = new NaturalLanguageClassifierV1(creds);
 
 ---
 
-## createClassifier(params, [callback])
+## createClassifier(params)
 Classifier を作成します。
 
 ```javascript
 nlc.createClassifier({
-    metadata: JSON.stringify({
+    trainingMetadata: JSON.stringify({
         name: 'watson-diet-trainer-test',
         language: 'ja'
     }),
-    training_data: fs.createReadStream('classifier.csv')
-}, (error, value) => {
-    if (error) {
-        console.log('error:', error);
-    } else {
-        console.log(value);
-    }
-});
+    trainingData: fs.createReadStream('classifier.csv')
+})
+  .then(value =>{
+    console.log(value);
+  })
+  .catch(error => {
+    console.log('error:', error);
+  });
 ```
 
 第1パラメータ params のプロパティを以下に示します。
 
-|Property	  |Type         |Description |
-|:------------|:------------|:-----------|
-|metadata     |string       |メタデータ。name と language を含んだJSON形式。未設定時は Error('Missing required parameters: training_data') を、JSONパースできない場合は Error('Missing metadata') をスローします。|
-|training_data|file / string|学習データ。(file は readStream) 未設定時は Error('Missing required parameters: training_data') をスローします。
+|Property	      |Type         |Description |
+|:----------------|:------------|:-----------|
+|trainingMetadata |string       |メタデータ。name と language を含んだJSON形式。未設定時は Error('Missing required parameters: training_data') を、JSONパースできない場合は Error('Missing metadata') をスローします。|
+|trainingData     |file / string|学習データ。(file は readStream) 未設定時は Error('Missing required parameters: training_data') をスローします。
 
 実行結果の例を以下に示します。
 
 - 正常ケース
-    - error: null
     - value:
     
         ```
@@ -141,7 +138,6 @@ nlc.createClassifier({
           description: 'This user or service instance has the maximum number of classifiers.'
         }
         ```
-    - value: null
 
 - エラーケース: 学習データが5件未満 
     - error: 
@@ -153,7 +149,6 @@ nlc.createClassifier({
           description: 'The number of training entries received = 2, which is smaller than the required minimum of 5'
         }
         ```
-    - value: null
 
 - エラーケース: 行頭が空 
     - error:
@@ -165,7 +160,6 @@ nlc.createClassifier({
           description: 'The \'training entry\' value at line 1 and column 1 is \'empty\'.'
         }
         ```
-    - value: null
 
 - エラーケース: 学習データが15,001件以上 (本家 watson-developer-cloud は 15,002件で以下のエラーになります。)
     - error:
@@ -177,7 +171,6 @@ nlc.createClassifier({
           description: 'The number of training entries received = 15,001, which is larger than the permitted maximum of 15,000'
         }
         ```
-    - value: null
         
 - エラーケース: 学習データのテキストに1,025文字以上のデータが1つ以上存在
     - error:
@@ -189,7 +182,6 @@ nlc.createClassifier({
           description: 'The phrase at line 1 has 1,025 characters which is larger than the permitted maximum of 1,024 characters.'
         }
         ```
-    - value: null
 
 - エラーケース: サービス資格情報 (url) のユーザー名またはパスワードが間違っている
     - error:
@@ -200,30 +192,28 @@ nlc.createClassifier({
           error: 'Not Authorized' 
         }
         ```
-    - value: null
 
 [API Reference](#api-reference)
 
 ---
 
-## listClassifiers(params, [callback])
+## listClassifiers(params)
 Classifier の一覧を取得します。
 
 ```javascript
-nlc.listClassifiers({}, (error, value) => {
-    if (error) {
-        console.log('error:', error);
-    } else {
-        console.log(value);
-    }
-});
+nlc.listClassifiers({})
+  .then(value =>{
+    console.log(value);
+  })
+  .catch(error => {
+    console.log('error:', error);
+  });
 ```
 
 第1パラメータ params は {} を指定してください。
 
 実行結果の例を以下に示します。
 - 正常ケース: Classifier が１つも存在しない
-    - error: null
     - value:
     
         ```
@@ -233,7 +223,6 @@ nlc.listClassifiers({}, (error, value) => {
         ```
 
 - 正常ケース: Classifier が1つ以上存在する
-    - error: null
     - value:
     
         ```
@@ -266,39 +255,36 @@ nlc.listClassifiers({}, (error, value) => {
           error: 'Not Authorized'
         }
         ```
-        
-    - value: null
 
 [API Reference](#api-reference)
 
 ---
 
-## getClassifier(params, [callback])
+## getClassifier(params)
 
 Classifier 情報を取得します。ステータスは Available (固定値) を返します。
 
 ```javascript
 nlc.getClassifier({
-    classifier_id: 'aa989ax8bb-nlc-b8989'
-}, (error, value) => {
-    if (error) {
-        console.log('error:', error);
-    } else {
-        console.log(value);
-    }
-});
+    classifierId: 'aa989ax8bb-nlc-b8989'
+})
+  .then(value =>{
+    console.log(value);
+  })
+  .catch(error => {
+    console.log('error:', error);
+  });
 ```
 
 第1パラメータ params のプロパティを以下に示します。
 
 |Property	  |Type         |Description |
 |:------------|:------------|:-----------|
-|classifier_id|string       |Classifier ID。未設定時は Error('Missing required parameters: classifier_id') をスローします。|
+|classifierId |string       |Classifier ID。未設定時は Error('Missing required parameters: classifierId') をスローします。|
 
 実行結果の例を以下に示します。
 
 - 正常ケース
-    - error: null
     - value:
     
         ```
@@ -322,9 +308,7 @@ nlc.getClassifier({
           error: 'Not Authorized'
         }
         ```
-        
-    - value: null
-
+      
 - エラーケース: 指定した Classifier が存在しない
     - error:
     
@@ -335,34 +319,32 @@ nlc.getClassifier({
           description: 'Classifier not found.'
         }
         ```
-        
-    - value: null
 
 [API Reference](#api-reference)
 
 ---
 
-## deleteClassifier(params, [callback])
+## deleteClassifier(params)
 
 Classifier を削除します。
 
 ```javascript
 nlc.deleteClassifier({
-    classifier_id: 'aa989ax8bb-nlc-b8989'
-}, (error, value) => {
-    if (error) {
-        console.log('error:', error);
-    } else {
-        console.log(value);
-    }
-});
+    classifierId: 'aa989ax8bb-nlc-b8989'
+})
+ .then(value =>{
+    console.log(value);
+  })
+  .catch(error => {
+    console.log('error:', error);
+  });
 ```
 
 第1パラメータ params のプロパティを以下に示します。
 
 |Property	  |Type         |Description |
 |:------------|:------------|:-----------|
-|classifier_id|string       |Classifier ID。未設定時は Error('Missing required parameters: classifier_id') をスローします。|
+|classifierId |string       |Classifier ID。未設定時は Error('Missing required parameters: classifierId') をスローします。|
 
 実行結果の例を以下に示します。
 
@@ -403,32 +385,31 @@ nlc.deleteClassifier({
 
 ---
 
-## classify(params, [callback])
+## classify(params)
 テキストをクラス分類します。
 
 ```javascript
 nlc.classify({
-    classifier_id: '85dfc9x224-nlc-2804',
-    text: 'こんにちは'
-}, (error, value) => {
-    if (error) {
-        console.log('error:', error);
-    } else {
-        console.log(value);
-    }
-});
+  classifierId: '85dfc9x224-nlc-2804',
+  text: 'こんにちは'
+})
+  .then(value =>{
+    console.log(value);
+  })
+  .catch(error => {
+    console.log('error:', error);
+  });
 ```
 
 第1パラメータ params のプロパティを以下に示します。
 
 |Property	  |Type         |Description |
 |:------------|:------------|:-----------|
-|classifier_id|string       |Classifier ID。未設定時は Error('Missing required parameters: classifier_id') をスローします。|
+|classifierId |string       |Classifier ID。未設定時は Error('Missing required parameters: classifierId') をスローします。|
 
 実行結果の例を以下に示します。
 
 - 正常ケース: クラス総数が10件以上
-    - error: null
     - value:
     
         ```
@@ -483,7 +464,6 @@ nlc.classify({
         ```
 
 - 正常ケース: クラス総数が10件未満 (例は1クラス)
-    - error: null
     - value:
     
         ```
@@ -510,9 +490,7 @@ nlc.classify({
           error: 'Not Authorized'
         }
         ```
-        
-    - value: null
-
+      
 - エラーケース: 指定した Classifier が存在しない
     - error:
     
@@ -523,9 +501,7 @@ nlc.classify({
           description: 'Classifier not found.'
         }
         ```
-        
-    - value: null
-
+      
 [API Reference](#api-reference)
 
 ---

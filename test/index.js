@@ -19,7 +19,7 @@ const
 // Cloudant サービス資格情報
 const creds = JSON.parse(process.env.CLOUDANT_CREDS);
 
-const assert = chai.assert;
+const { assert } = chai;
 
 let nlc, errorNlc, firstClassifierId, secondClassifierId, lastClassifierId;
 
@@ -50,538 +50,638 @@ describe('constructor', () => {
   });
 });
 
-describe('list', () => {
+describe('listClassifiers', () => {
   it('classifiers: 0件', (done) => {
-    nlc.list({}, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.deepEqual({ classifiers: [] }, value);
-      assert.equal(null, error);
-      done();
-    });
+    nlc.listClassifiers({})
+      .then(v => {
+        console.log(v);
+        assert.deepEqual({ classifiers: [] }, v);
+        done();
+      })
+      .catch(e => {
+        console.log('error:', e);
+        done(e);
+      });
   });
 
   it('Not Authorized', (done) => {
-    errorNlc.list({}, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(401, error.code);
-      assert.equal('Not Authorized', error.error);
-      assert.equal(null, value);
-      done();
-    });
+    errorNlc.listClassifiers({})
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        assert.equal(401, e.code);
+        assert.equal('Not Authorized', e.error);
+        done();
+      });
   });
 });
 
-describe('create', () => {
-  it('Missing required parameters: metadata', (done) => {
-    try {
-      nlc.create({
-        training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
+describe('createClassifier', () => {
+  it('Missing required parameters: trainingMetadata', (done) => {
+    nlc.createClassifier({
+      trainingData: fs.createReadStream(`${__dirname}/classifier.csv`)
+    })
+      .then(v => {
+        console.log(v);
+        done(v)
+      })
+      .catch(e => {
+        assert.equal('Missing required parameters: trainingMetadata', e.message);
+        done();
       });
-    } catch (e) {
-      assert.equal('Missing required parameters: metadata', e.message);
-      done();
-    }
   });
 
-  it('Missing metadata', (done) => {
-    try {
-      nlc.create({
-        metadata: {
-          name: 'watson-diet-trainer',
-          language: 'ja'
-        },
-        training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
+  it('Missing trainingMetadata', (done) => {
+    nlc.createClassifier({
+      trainingMetadata: {
+        name: 'watson-diet-trainer',
+        language: 'ja'
+      },
+      trainingData: fs.createReadStream(`${__dirname}/classifier.csv`)
+    })
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        assert.equal('Missing trainingMetadata', e.message);
+        done();
       });
-    } catch (e) {
-      assert.equal('Missing metadata', e.message);
-      done();
-    }
   });
 
-  it('Missing required parameters: training_data', (done) => {
-    try {
-      nlc.create({
-        metadata: JSON.stringify({
-          name: 'watson-diet-trainer',
-          language: 'ja'
-        })
+  it('Missing required parameters: trainingData', (done) => {
+    nlc.createClassifier({
+      trainingMetadata: JSON.stringify({
+        name: 'watson-diet-trainer',
+        language: 'ja'
+      })
+    })
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        assert.equal('Missing required parameters: trainingData', e.message);
+        done();
       });
-    } catch (e) {
-      assert.equal('Missing required parameters: training_data', e.message);
-      done();
-    }
   });
 
   it('classifier first', (done) => {
-    nlc.create({
-      metadata: JSON.stringify({
+    nlc.createClassifier({
+      trainingMetadata: JSON.stringify({
         name: 'watson-diet-trainer',
         language: 'ja'
       }),
-      training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      firstClassifierId = value.classifier_id;
-      assert(value.classifier_id);
-      assert(value.url);
-      assert(value.name);
-      assert(value.language);
-      assert(value.created);
-      setTimeout(() => {
-        done();
-      }, 1000);
-    });
+      trainingData: fs.createReadStream(`${__dirname}/classifier.csv`)
+    })
+      .then(v => {
+        console.log(v);
+        firstClassifierId = v.classifier_id;
+        assert(v.classifier_id);
+        assert(v.url);
+        assert(v.name);
+        assert(v.language);
+        assert(v.created);
+        setTimeout(() => {
+          done();
+        }, 1000);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        done(e);
+      });
   });
 
   it('Not Authorized, トレーニングデータ: file', (done) => {
-    errorNlc.create({
-      metadata: JSON.stringify({
+    errorNlc.createClassifier({
+      trainingMetadata: JSON.stringify({
         name: 'watson-diet-trainer',
         language: 'ja'
       }),
-      training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(401, error.code);
-      assert.equal('Not Authorized', error.error);
-      assert.equal(null, value);
-      setTimeout(() => {
-        done();
-      }, 1000);
-    });
+      trainingData: fs.createReadStream(`${__dirname}/classifier.csv`)
+    })
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        assert.equal(401, e.code);
+        assert.equal('Not Authorized', e.error);
+        setTimeout(() => {
+          done();
+        }, 1000);
+      });
   });
 
   it('Data too small, トレーニングデータ: file', (done) => {
-    nlc.create({
-      metadata: JSON.stringify({
+    nlc.createClassifier({
+      trainingMetadata: JSON.stringify({
         name: 'watson-diet-trainer',
         language: 'ja'
       }),
-      training_data: fs.createReadStream(`${__dirname}/classifier_3.csv`)
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(400, error.code);
-      assert.equal('Data too small', error.error);
-      assert.equal(null, value);
-      done();
-    });
+      trainingData: fs.createReadStream(`${__dirname}/classifier_3.csv`)
+    })
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        assert.equal(400, e.code);
+        assert.equal('Data too small', e.error);
+        setTimeout(() => {
+          done();
+        }, 1000);
+      });
   });
 
   it('Malformed data, トレーニングデータ: string', (done) => {
-    nlc.create({
-      metadata: JSON.stringify({
+    nlc.createClassifier({
+      trainingMetadata: JSON.stringify({
         name: 'watson-diet-trainer',
         language: 'ja'
       }),
-      training_data: fs.readFileSync(`${__dirname}/classifier_malformed_data_5.csv`).toString()
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(400, error.code);
-      assert.equal('Malformed data', error.error);
-      assert.equal(null, value);
-      done();
-    });
+      trainingData: fs.readFileSync(`${__dirname}/classifier_malformed_data_5.csv`).toString()
+    })
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        assert.equal(400, e.code);
+        assert.equal('Malformed data', e.error);
+        done();
+      });
   });
 
   it('Too many data instances, トレーニングデータ: file', (done) => {
-    nlc.create({
-      metadata: JSON.stringify({
+    nlc.createClassifier({
+      trainingMetadata: JSON.stringify({
         name: 'watson-diet-trainer',
         language: 'ja'
       }),
-      training_data: fs.createReadStream(`${__dirname}/classifier_15001.csv`)
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(400, error.code);
-      assert.equal('Too many data instances', error.error);
-      assert.equal(null, value);
-      done();
-    });
+      trainingData: fs.createReadStream(`${__dirname}/classifier_15001.csv`)
+    })
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        assert.equal(400, e.code);
+        assert.equal('Too many data instances', e.error);
+        done();
+      });
   });
 
   it('Phrase too long, トレーニングデータ: file', (done) => {
-    nlc.create({
-      metadata: JSON.stringify({
+    nlc.createClassifier({
+      trainingMetadata: JSON.stringify({
         name: 'watson-diet-trainer',
         language: 'ja'
       }),
-      training_data: fs.createReadStream(`${__dirname}/classifier_phrase_too_long_4.csv`)
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(400, error.code);
-      assert.equal('Phrase too long', error.error);
-      assert.equal(null, value);
-      done();
-    });
+      trainingData: fs.createReadStream(`${__dirname}/classifier_phrase_too_long_4.csv`)
+    })
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        assert.equal(400, e.code);
+        assert.equal('Phrase too long', e.error);
+        done();
+      });
   });
 
   it('classifier 2nd', (done) => {
-    nlc.create({
-      metadata: JSON.stringify({
+    nlc.createClassifier({
+      trainingMetadata: JSON.stringify({
         name: 'watson-diet-trainer',
         language: 'ja'
       }),
-      training_data: fs.createReadStream(`${__dirname}/classifier_10.csv`)
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      secondClassifierId = value.classifier_id;
-      assert(value.classifier_id);
-      assert(value.url);
-      assert(value.name);
-      assert(value.language);
-      assert(value.created);
-      setTimeout(() => {
-        done();
-      }, 1000);
-    });
+      trainingData: fs.createReadStream(`${__dirname}/classifier_10.csv`)
+    })
+      .then(v => {
+        secondClassifierId = v.classifier_id;
+        assert(v.classifier_id);
+        assert(v.url);
+        assert(v.name);
+        assert(v.language);
+        assert(v.created);
+        setTimeout(() => {
+          done();
+        }, 1000);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        done(e);
+      });
   });
 
   it('classifier 3nd', (done) => {
-    nlc.create({
-      metadata: JSON.stringify({
+    nlc.createClassifier({
+      trainingMetadata: JSON.stringify({
         name: 'watson-diet-trainer',
         language: 'ja'
       }),
-      training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert(value.classifier_id);
-      assert(value.url);
-      assert(value.name);
-      assert(value.language);
-      assert(value.created);
-      setTimeout(() => {
-        done();
-      }, 1000);
-    });
+      trainingData: fs.createReadStream(`${__dirname}/classifier.csv`)
+    })
+      .then(v => {
+        assert(v.classifier_id);
+        assert(v.url);
+        assert(v.name);
+        assert(v.language);
+        assert(v.created);
+        setTimeout(() => {
+          done();
+        }, 1000);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        done(e);
+      });
   });
 
   it('classifier 4th', (done) => {
-    nlc.create({
-      metadata: JSON.stringify({
+    nlc.createClassifier({
+      trainingMetadata: JSON.stringify({
         name: 'watson-diet-trainer',
         language: 'ja'
       }),
-      training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert(value.classifier_id);
-      assert(value.url);
-      assert(value.name);
-      assert(value.language);
-      assert(value.created);
-      setTimeout(() => {
-        done();
-      }, 1000);
-    });
+      trainingData: fs.createReadStream(`${__dirname}/classifier.csv`)
+    })
+      .then(v => {
+        assert(v.classifier_id);
+        assert(v.url);
+        assert(v.name);
+        assert(v.language);
+        assert(v.created);
+        setTimeout(() => {
+          done();
+        }, 1000);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        done(e);
+      });
   });
 
   it('classifier 5th', (done) => {
-    nlc.create({
-      metadata: JSON.stringify({
+    nlc.createClassifier({
+      trainingMetadata: JSON.stringify({
         name: 'watson-diet-trainer',
         language: 'ja'
       }),
-      training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert(value.classifier_id);
-      assert(value.url);
-      assert(value.name);
-      assert(value.language);
-      assert(value.created);
-      setTimeout(() => {
-        done();
-      }, 1000);
-    });
+      trainingData: fs.createReadStream(`${__dirname}/classifier.csv`)
+    })
+      .then(v => {
+        assert(v.classifier_id);
+        assert(v.url);
+        assert(v.name);
+        assert(v.language);
+        assert(v.created);
+        setTimeout(() => {
+          done();
+        }, 1000);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        done(e);
+      });
   });
 
   it('classifier 6th', (done) => {
-    nlc.create({
-      metadata: JSON.stringify({
+    nlc.createClassifier({
+      trainingMetadata: JSON.stringify({
         name: 'watson-diet-trainer',
         language: 'ja'
       }),
-      training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert(value.classifier_id);
-      assert(value.url);
-      assert(value.name);
-      assert(value.language);
-      assert(value.created);
-      setTimeout(() => {
-        done();
-      }, 1000);
-    });
+      trainingData: fs.createReadStream(`${__dirname}/classifier.csv`)
+    })
+      .then(v => {
+        assert(v.classifier_id);
+        assert(v.url);
+        assert(v.name);
+        assert(v.language);
+        assert(v.created);
+        setTimeout(() => {
+          done();
+        }, 1000);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        done(e);
+      });
   });
 
   it('classifier 7th', (done) => {
-    nlc.create({
-      metadata: JSON.stringify({
+    nlc.createClassifier({
+      trainingMetadata: JSON.stringify({
         name: 'watson-diet-trainer',
         language: 'ja'
       }),
-      training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert(value.classifier_id);
-      assert(value.url);
-      assert(value.name);
-      assert(value.language);
-      assert(value.created);
-      setTimeout(() => {
-        done();
-      }, 1000);
-    });
+      trainingData: fs.createReadStream(`${__dirname}/classifier.csv`)
+    })
+      .then(v => {
+        assert(v.classifier_id);
+        assert(v.url);
+        assert(v.name);
+        assert(v.language);
+        assert(v.created);
+        setTimeout(() => {
+          done();
+        }, 1000);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        done(e);
+      });
   });
 
   it('classifier 8th', (done) => {
-    nlc.create({
-      metadata: JSON.stringify({
+    nlc.createClassifier({
+      trainingMetadata: JSON.stringify({
         name: 'watson-diet-trainer',
         language: 'ja'
       }),
-      training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      lastClassifierId = value.classifier_id;
-      assert(value.classifier_id);
-      assert(value.url);
-      assert(value.name);
-      assert(value.language);
-      assert(value.created);
-      setTimeout(() => {
-        done();
-      }, 2000);
-    });
+      trainingData: fs.createReadStream(`${__dirname}/classifier.csv`)
+    })
+      .then(v => {
+        lastClassifierId = v.classifier_id;
+        assert(v.classifier_id);
+        assert(v.url);
+        assert(v.name);
+        assert(v.language);
+        assert(v.created);
+        setTimeout(() => {
+          done();
+        }, 1000);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        done(e);
+      });
   });
 
   it('Entitlement error', (done) => {
-    nlc.create({
-      metadata: JSON.stringify({
+    nlc.createClassifier({
+      trainingMetadata: JSON.stringify({
         name: 'watson-diet-trainer',
         language: 'ja'
       }),
-      training_data: fs.createReadStream(`${__dirname}/classifier.csv`)
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(400, error.code);
-      assert.equal('Entitlement error', error.error);
-      assert.equal(null, value);
-      done();
-    });
+      trainingData: fs.createReadStream(`${__dirname}/classifier.csv`)
+    })
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        assert.equal(400, e.code);
+        assert.equal('Entitlement error', e.error);
+        done();
+      });
   });
 });
 
-describe('remove', () => {
-  it('Missing required parameters: classifier_id', (done) => {
-    try {
-      nlc.remove({});
-    } catch (e) {
-      assert.equal('Missing required parameters: classifier_id', e.message);
-      done();
-    }
+describe('deleteClassifier', () => {
+  it('Missing required parameters: classifierId', (done) => {
+    nlc.deleteClassifier({})
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        assert.equal('Missing required parameters: classifierId', e.message);
+        done();
+      });
   });
 
   it('Not Authorized', (done) => {
-    errorNlc.remove({
-      classifier_id: lastClassifierId
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(401, error.code);
-      assert.equal('Not Authorized', error.error);
-      assert.equal(null, value);
-      done();
-    });
+    errorNlc.deleteClassifier({
+      classifierId: lastClassifierId
+    })
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        assert.equal(401, e.code);
+        assert.equal('Not Authorized', e.error);
+        done();
+      });
   });
 
   it('classifiers 8th', (done) => {
-    nlc.remove({
-      classifier_id: lastClassifierId
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(null, error);
-      assert.deepEqual({}, value);
-      done();
-    });
+    nlc.deleteClassifier({
+      classifierId: lastClassifierId
+    })
+      .then(v => {
+        assert.deepEqual({}, v);
+        done();
+      })
+      .catch(e => {
+        console.log('error:', e);
+        done(e);
+      });
   });
 
   it('Not found', (done) => {
-    nlc.remove({
-      classifier_id: lastClassifierId
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(404, error.code);
-      assert.equal('Not found', error.error);
-      assert.equal(null, value);
-      setTimeout(() => {
-        done();
-      }, 1000);
-    });
+    nlc.deleteClassifier({
+      classifierId: lastClassifierId
+    })
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        assert.equal(404, e.code);
+        assert.equal('Not found', e.error);
+        setTimeout(() => {
+          done();
+        }, 1000);
+      });
   });
 });
 
 describe('classify', () => {
-  it('Missing required parameters: classifier_id', (done) => {
-    try {
-      nlc.classify({
-        text: 'こんにちは'
+  it('Missing required parameters: classifierId', (done) => {
+    nlc.classify({
+      text: 'こんにちは'
+    })
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        assert.equal('Missing required parameters: classifierId', e.message);
+        done();
       });
-    } catch (e) {
-      assert.equal('Missing required parameters: classifier_id', e.message);
-      done();
-    }
   });
 
   it('Missing required parameters: text', (done) => {
-    try {
-      nlc.classify({
-        classifier_id: lastClassifierId
+    nlc.classify({
+      classifierId: lastClassifierId
+    })
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        assert.equal('Missing required parameters: text', e.message);
+        done();
       });
-    } catch (e) {
-      assert.equal('Missing required parameters: text', e.message);
-      done();
-    }
   });
 
   it('Not Authorized', (done) => {
     errorNlc.classify({
-      classifier_id: firstClassifierId,
+      classifierId: firstClassifierId,
       text: 'こんにちは'
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(401, error.code);
-      assert.equal('Not Authorized', error.error);
-      assert.equal(null, value);
-      done();
-    });
+    })
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        assert.equal(401, e.code);
+        assert.equal('Not Authorized', e.error);
+        done();
+      });
   });
 
   it('Not found', (done) => {
     nlc.classify({
-      classifier_id: lastClassifierId,
+      classifierId: lastClassifierId,
       text: 'こんにちは'
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(404, error.code);
-      assert.equal('Not found', error.error);
-      assert.equal(null, value);
-      setTimeout(() => {
-        done();
-      }, 1000);
-    });
+    })
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        assert.equal(404, e.code);
+        assert.equal('Not found', e.error);
+        setTimeout(() => {
+          done();
+        }, 1000);
+      });
   });
 
   it('classifier first', (done) => {
     nlc.classify({
-      classifier_id: firstClassifierId,
+      classifierId: firstClassifierId,
       text: 'こんにちは'
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(null, error);
-      assert(value.classifier_id);
-      assert(value.text);
-      assert(value.top_class);
-      assert(value.url);
-      assert(value.classes);
-      done();
-    });
+    })
+      .then(v => {
+        assert(v.classifier_id);
+        assert(v.text);
+        assert(v.top_class);
+        assert(v.url);
+        assert(v.classes);
+        done();
+      })
+      .catch(e => {
+        console.log('error:', e);
+        done(e);
+      });
   });
 
   it('classifier 2nd クラス総数10未満, キーワードアンマッチ', (done) => {
     nlc.classify({
-      classifier_id: secondClassifierId,
+      classifierId: secondClassifierId,
       text: 'こんにちは'
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(null, error);
-      assert(value.classifier_id);
-      assert(value.text);
-      assert(value.top_class);
-      assert(value.url);
-      assert(value.classes);
-      done();
-    });
+    })
+      .then(v => {
+        assert(v.classifier_id);
+        assert(v.text);
+        assert(v.top_class);
+        assert(v.url);
+        assert(v.classes);
+        done();
+      })
+      .catch(e => {
+        console.log('error:', e);
+        done(e);
+      });
   });
 });
 
-describe('status', () => {
+describe('getClassifier', () => {
   it('Missing required parameters: classifier_id', (done) => {
-    try {
-      nlc.status({});
-    } catch (e) {
-      assert.equal('Missing required parameters: classifier_id', e.message);
-      done();
-    }
+    nlc.getClassifier({})
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        assert.equal('Missing required parameters: classifierId', e.message);
+        done();
+      });
   });
 
   it('Not Authorized', (done) => {
-    errorNlc.status({
-      classifier_id: firstClassifierId
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(401, error.code);
-      assert.equal('Not Authorized', error.error);
-      assert.equal(null, value);
-      done();
-    });
+    errorNlc.getClassifier({
+      classifierId: firstClassifierId
+    })
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        assert.equal(401, e.code);
+        assert.equal('Not Authorized', e.error);
+        done();
+      });
   });
 
   it('Not found', (done) => {
-    nlc.status({
-      classifier_id: lastClassifierId
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(404, error.code);
-      assert.equal('Not found', error.error);
-      assert.equal(null, value);
-      setTimeout(() => {
-        done();
-      }, 1000);
-    });
+    nlc.getClassifier({
+      classifierId: lastClassifierId
+    })
+      .then(v => {
+        console.log(v);
+        done(v);
+      })
+      .catch(e => {
+        console.log('error:', e);
+        assert.equal(404, e.code);
+        assert.equal('Not found', e.error);
+        setTimeout(() => {
+          done();
+        }, 1000);
+      });
   });
 
   it('classifier first', (done) => {
-    nlc.status({
-      classifier_id: firstClassifierId
-    }, (error, value) => {
-      if (error) console.log('error:', error);
-      console.log(value);
-      assert.equal(null, error);
-      assert(value.classifier_id);
-      assert(value.name);
-      assert(value.language);
-      assert(value.created);
-      assert(value.url);
-      assert(value.status);
-      assert(value.status_description);
-      done();
-    });
+    nlc.getClassifier({
+      classifierId: firstClassifierId
+    })
+      .then(v => {
+        assert(v.classifier_id);
+        assert(v.name);
+        assert(v.language);
+        assert(v.created);
+        assert(v.url);
+        assert(v.status);
+        assert(v.status_description);
+        done();
+      })
+      .catch(e => {
+        console.log('error:', e);
+        done(e);
+      });
   });
 });

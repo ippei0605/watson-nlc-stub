@@ -1,6 +1,6 @@
 {
   "name": "watson-nlc-stub",
-  "version": "0.0.9",
+  "version": "5.0.0",
   "description": "Watson NLC Stub",
   "author": "Ippei SUZUKI",
   "repository": {
@@ -10,8 +10,8 @@
   "license": "MIT",
   "main": "./index",
   "scripts": {
-    "doc": "jsdoc -c jsdoc-conf.json index.js",
-    "test": "nyc --reporter=lcov mocha",
+    "jsdoc": "jsdoc -c jsdoc-conf.json *.js",
+    "test": "nyc --reporter=cobertura --reporter=html mocha",
     "codecov": "codecov"
   },
   "dependencies": {

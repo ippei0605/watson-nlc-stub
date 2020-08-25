@@ -17,8 +17,6 @@ Watson Natural Language Classifier は自然言語分類してくれる素晴ら
 * 5.0.0 以降は、ibm-watson 5以上のスタブとして動作します。
 * 0.0.9 は、ibm-watson 4 または watson-developer-cloud のスタブとして動作します。
 
-> ibm-watson 5 以降と未満の違いは、第一階層のパラメータがLCCに変更されたことと、コールバックからプロミスに変更されたことです。~~超くだらねー修正で手間取らせやがって、こんちくしょうめ！！~~
-
 ### 使い方
 ```javascript
 const NaturalLanguageClassifierV1 = require('watson-nlc-stub');
@@ -216,43 +214,71 @@ nlc.listClassifiers({})
 - 正常ケース: Classifier が１つも存在しない
     - value:
     
-        ```
+        ```json
         {
-          classifiers: []
+            "status": 200,
+            "statusText": "OK",
+            "headers": {},
+            "result": {
+                "classifiers": []
+            }
         }
         ```
 
 - 正常ケース: Classifier が1つ以上存在する
     - value:
     
-        ```
+        ```json
         {
-          classifiers: [
-            {
-              classifier_id: '8999a8xa9a-nlc-888ab',
-              url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/8999a8xa9a-nlc-888ab',
-              name: 'watson-diet-trainer',
-              language: 'ja',
-              created: '2017-09-18T14:50:34.915Z'
-            },
-            {
-              classifier_id: 'ab9a98x8ba-nlc-9b9aa',
-              url: 'https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/ab9a98x8ba-nlc-9b9aa',
-              name: 'watson-diet-trainer-test',
-              language: 'ja',
-              created: '2017-09-18T14:51:05.812Z'
+            "status": 200,
+            "statusText": "OK",
+            "headers": {},
+            "result": {
+                "classifiers": [
+                    {
+                        "classifier_id": "8999a8xa9a-nlc-888ab",
+                        "url": "https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/8999a8xa9a-nlc-888ab",
+                        "name": "watson-diet-trainer",
+                        "language": "ja",
+                        "created": "2017-09-18T14:50:34.915Z"
+                    },
+                    {
+                        "classifier_id": "ab9a98x8ba-nlc-9b9aa",
+                        "url": "https://gateway.watsonplatform.net/natural-language-classifier/api/v1/classifiers/ab9a98x8ba-nlc-9b9aa",
+                        "name": "watson-diet-trainer-test",
+                        "language": "ja",
+                        "created": "2017-09-18T14:51:05.812Z"
+                    }
+                ]
             }
-          ]
         }
         ```
 
-- エラーケース: サービス資格情報 (url) のユーザー名またはパスワードが間違っている
+- エラーケース: apikey が間違っている
     - error:
     
-        ```
+        ```json
         {
-          code: 401,
-          error: 'Not Authorized'
+            "message": "Bad Request: Access is denied due to invalid credentials.",
+            "statusText": "Bad Request",
+            "status": 400,
+            "code": 400,
+            "body": "{\"errorCode\":\"BXNIM0415E\",\"errorMessage\":\"Provided API key could not be found\"}",
+            "headers": {}
+        }
+        ```
+
+- エラーケース: url が間違っている
+    - error:
+    
+        ```json
+        {
+            "message": "Forbidden: Access is denied due to invalid credentials.",
+            "statusText": "Forbidden",
+            "status": 403,
+            "code": 403,
+            "body": "{\"code\":403,\"error\":\"Forbidden\"}",
+            "headers": {}
         }
         ```
 
@@ -299,24 +325,44 @@ nlc.getClassifier({
         }
         ```
 
-- エラーケース: サービス資格情報 (url) のユーザー名またはパスワードが間違っている
+- エラーケース: apikey が間違っている
     - error:
     
-        ```
+        ```json
         {
-          code: 401,
-          error: 'Not Authorized'
+            "message": "Bad Request: Access is denied due to invalid credentials.",
+            "statusText": "Bad Request",
+            "status": 400,
+            "code": 400,
+            "body": "{\"errorCode\":\"BXNIM0415E\",\"errorMessage\":\"Provided API key could not be found\"}",
+            "headers": {}
+        }
+        ```
+
+- エラーケース: url が間違っている
+    - error:
+    
+        ```json
+        {
+            "message": "Forbidden: Access is denied due to invalid credentials.",
+            "statusText": "Forbidden",
+            "status": 403,
+            "code": 403,
+            "body": "{\"code\":403,\"error\":\"Forbidden\"}",
+            "headers": {}
         }
         ```
       
 - エラーケース: 指定した Classifier が存在しない
     - error:
     
-        ```
+        ```json
         {
-          code: 404,
-          error: 'Not found',
-          description: 'Classifier not found.'
+            "statusText": "Not Found",
+            "status": 404,
+            "code": 404,
+            "body": "{\"code\":404,\"error\":\"Not found\",\"description\":\"Classifier not found.\"}",
+            "headers": {}
         }
         ```
 

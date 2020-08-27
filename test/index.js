@@ -11,15 +11,13 @@
 
 // モジュールを読込む。
 const
-  chai = require('chai'),
+  { assert } = require('chai'),
   Cloudant = require('@cloudant/cloudant'),
   fs = require('fs'),
   NaturalLanguageClassifierV1 = require('../index');
 
 // Cloudant サービス資格情報
 const creds = JSON.parse(process.env.CLOUDANT_CREDS);
-
-const { assert } = chai;
 
 let nlc, errorNlc, forbiddenNlc, firstClassifierId, secondClassifierId, lastClassifierId;
 
